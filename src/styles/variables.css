@@ -1,0 +1,54 @@
+/* ===== Color Palette (Japanese Web Style) ===== */
+:root {
+  /* Primary Teal */
+  --color-primary-dark: #3B7A8C;
+  --color-primary: #4A9BAD;
+  --color-primary-light: #5AABB8;
+  --color-primary-lighter: #6ABDD4;
+  --color-primary-lightest: #8CD4E8;
+
+  /* Accent Orange */
+  --color-accent: #E08050;
+  --color-accent-light: #C0836A;
+
+  /* Neutral */
+  --color-text: #333;
+  --color-text-light: #666;
+  --color-text-muted: #888;
+  --color-border: #e0e0e0;
+  --color-border-light: #e8e8e8;
+  --color-bg: #f5f6f8;
+  --color-bg-white: #fff;
+  --color-bg-light: #fafafa;
+
+  /* Status */
+  --color-warning-bg: #FFF8DC;
+  --color-warning-border: #E8D5A0;
+  --color-warning-text: #8B6914;
+
+  /* Layer colors */
+  --layer-0: var(--color-primary-dark);
+  --layer-1: var(--color-primary);
+  --layer-2: var(--color-primary-light);
+  --layer-3: var(--color-primary-lighter);
+  --layer-4: var(--color-accent);
+
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 20px;
+
+  /* Border radius */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+
+  /* Font */
+  --font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+  --font-size-xs: 10px;
+  --font-size-sm: 11px;
+  --font-size-base: 12px;
+  --font-size-md: 13px;
+  --font-size-lg: 18px;
+}

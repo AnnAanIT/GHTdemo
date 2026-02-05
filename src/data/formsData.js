@@ -1,0 +1,312 @@
+// 申請書類管理 - Form Data (107 forms)
+// Layer structure:
+// Layer 0: 在留資格 (root) - 必須
+//    ├── Layer 1: 申請種別 (認定/変更/更新)
+//    ├── Layer 2: 機関情報 (受入機関 + カテゴリー)
+//    ├── Layer 3: 分野 (只 特定技能)
+//    │       └── Layer 4: 雇用形態 (只 農業/漁業)
+
+export const visaTypes = [
+  { value: 'tokutei1', label: '特定技能1号' },
+  { value: 'tokutei2', label: '特定技能2号' },
+  { value: 'tokkatsu', label: '特定活動' },
+  { value: 'intern', label: 'インターン' },
+  { value: 'gijinkoku', label: '技術・人文知識・国際業務' },
+];
+
+export const appTypes = [
+  { value: 'nintei', label: '認定' },
+  { value: 'henko', label: '変更' },
+  { value: 'koshin', label: '更新' },
+];
+
+export const orgTypes = [
+  { value: 'undecided', label: '未定' },
+  { value: 'hojin', label: '法人' },
+  { value: 'kojin', label: '個人事業主' },
+];
+
+export const categories = [
+  { value: '1', label: 'カテゴリー1' },
+  { value: '2', label: 'カテゴリー2' },
+  { value: '3', label: 'カテゴリー3' },
+  { value: '4', label: 'カテゴリー4' },
+];
+
+export const sectors = [
+  { value: 'kaigo', label: '介護' },
+  { value: 'building', label: 'ビルクリーニング' },
+  { value: 'manufacturing', label: '工業製品製造業' },
+  { value: 'construction', label: '建設' },
+  { value: 'shipbuilding', label: '造船・舶用工業' },
+  { value: 'auto-maintenance', label: '自動車整備' },
+  { value: 'aviation', label: '航空' },
+  { value: 'accommodation', label: '宿泊' },
+  { value: 'agriculture', label: '農業' },
+  { value: 'fishery', label: '漁業' },
+  { value: 'food-manufacturing', label: '飲食料品製造業' },
+  { value: 'food-service', label: '外食業' },
+  { value: 'auto-transport', label: '自動車運送業' },
+  { value: 'railway', label: '鉄道' },
+  { value: 'forestry', label: '林業' },
+  { value: 'wood', label: '木材産業' },
+];
+
+export const employmentTypes = [
+  { value: 'direct', label: '直接雇用' },
+  { value: 'dispatch', label: '派遣雇用' },
+];
+
+export const layerNames = {
+  1: '共通',
+  2: '機関',
+  3: '分野',
+  4: '派遣',
+};
+
+export const formsData = [
+  // ===== 別記様式 (申請書) =====
+  { no: 1, form_no: "別記第6号の3様式", form_name: "申請書（在留資格認定証明書交付申請書）", layer: 1,
+    visa: ["tokutei1", "tokutei2"], appType: ["nintei"], sector: null, org: null, category: null, employment: null },
+  { no: 2, form_no: "別記第30号様式", form_name: "申請書（在留資格変更許可申請書）", layer: 1,
+    visa: ["tokutei1", "tokutei2"], appType: ["henko"], sector: null, org: null, category: null, employment: null },
+  { no: 3, form_no: "別記第30号の2様式", form_name: "申請書（在留期間更新許可申請書）", layer: 1,
+    visa: ["tokutei1", "tokutei2"], appType: ["koshin"], sector: null, org: null, category: null, employment: null },
+  { no: 4, form_no: "別記第30号様式（特活用）", form_name: "在留資格変更許可申請書", layer: 1,
+    visa: ["tokkatsu"], appType: ["henko"], sector: null, org: null, category: null, employment: null },
+  { no: 5, form_no: "別記第6号の3様式（インターン用）", form_name: "在留資格認定証明書交付申請書", layer: 1,
+    visa: ["intern"], appType: ["nintei"], sector: null, org: null, category: null, employment: null },
+  { no: 6, form_no: "別記第6号の3様式（技人国用）", form_name: "在留資格認定証明書交付申請書（技人国用）", layer: 1,
+    visa: ["gijinkoku"], appType: ["nintei"], sector: null, org: null, category: null, employment: null },
+  { no: 7, form_no: "別記第30号様式（技人国用）", form_name: "在留資格変更許可申請書（技人国用）", layer: 1,
+    visa: ["gijinkoku"], appType: ["henko"], sector: null, org: null, category: null, employment: null },
+  { no: 8, form_no: "別記第30号の2様式（技人国用）", form_name: "在留期間更新許可申請書（技人国用）", layer: 1,
+    visa: ["gijinkoku"], appType: ["koshin"], sector: null, org: null, category: null, employment: null },
+
+  // ===== 参考様式 (共通) =====
+  { no: 9, form_no: "参考様式第1-3号別紙", form_name: "受診者の申告書", layer: 1,
+    visa: ["tokutei1", "tokutei2"], appType: ["nintei", "henko"], sector: null, org: null, category: null, employment: null },
+  { no: 10, form_no: "参考様式第1-4号", form_name: "特定技能外国人の報酬に関する説明書", layer: 1,
+    visa: ["tokutei1", "tokutei2"], appType: ["nintei", "henko"], sector: null, org: null, category: null, employment: null },
+  { no: 11, form_no: "参考様式第1-5号", form_name: "特定技能雇用契約書", layer: 1,
+    visa: ["tokutei1", "tokutei2", "tokkatsu"], appType: ["nintei", "henko", "koshin"], sector: null, org: null, category: null, employment: null },
+  { no: 12, form_no: "参考様式第1-6号", form_name: "雇用条件書", layer: 1,
+    visa: ["tokutei1", "tokutei2", "tokkatsu"], appType: ["nintei", "henko", "koshin"], sector: null, org: null, category: null, employment: null },
+  { no: 13, form_no: "参考様式第1-6号別紙", form_name: "賃金の支払", layer: 1,
+    visa: ["tokutei1", "tokutei2", "tokkatsu"], appType: ["nintei", "henko", "koshin"], sector: null, org: null, category: null, employment: null },
+  { no: 14, form_no: "参考様式第1-10号", form_name: "技能移転に係る申告書", layer: 1,
+    visa: ["tokutei2"], appType: ["nintei"], sector: null, org: null, category: null, employment: null },
+  { no: 15, form_no: "参考様式第1-11-1号", form_name: "特定技能所属機関概要書", layer: 1,
+    visa: ["tokutei1", "tokutei2"], appType: ["nintei", "henko"], sector: null, org: null, category: null, employment: null },
+  { no: 16, form_no: "参考様式第1-16号", form_name: "雇用の経緯に係る説明書", layer: 1,
+    visa: ["tokutei1", "tokutei2"], appType: ["nintei", "henko"], sector: null, org: null, category: null, employment: null },
+  { no: 17, form_no: "参考様式第1-17号", form_name: "１号特定技能外国人支援計画書", layer: 1,
+    visa: ["tokutei1", "tokutei2"], appType: ["nintei", "henko"], sector: null, org: null, category: null, employment: null },
+  { no: 18, form_no: "参考様式第1-23号", form_name: "特定技能所属機関の役員に関する誓約書", layer: 1,
+    visa: ["tokutei1", "tokutei2"], appType: ["nintei", "henko"], sector: null, org: ["hojin"], category: null, employment: null },
+  { no: 19, form_no: "参考様式第1-25号", form_name: "登録支援機関との支援委託契約に関する説明書", layer: 1,
+    visa: ["tokutei1", "tokutei2"], appType: ["nintei", "henko"], sector: null, org: null, category: null, employment: null },
+  { no: 20, form_no: "参考様式第1-26号", form_name: "公的義務履行に関する誓約書", layer: 1,
+    visa: ["tokutei1", "tokutei2"], appType: ["henko", "koshin"], sector: null, org: null, category: ["3", "4"], employment: null },
+  { no: 21, form_no: "参考様式第1-27号", form_name: "公的義務履行に関する説明書", layer: 1,
+    visa: ["tokutei1", "tokutei2"], appType: ["nintei", "henko", "koshin"], sector: null, org: null, category: ["3", "4"], employment: null },
+  { no: 22, form_no: "参考様式第1-29号", form_name: "書類省略に当たっての誓約書", layer: 1,
+    visa: ["tokutei1", "tokutei2"], appType: ["nintei", "henko"], sector: null, org: null, category: ["1", "2"], employment: null },
+  { no: 23, form_no: "申請人名簿", form_name: "申請人名簿", layer: 1,
+    visa: ["tokutei1", "tokutei2", "tokkatsu"], appType: ["nintei", "henko", "koshin"], sector: null, org: null, category: null, employment: null },
+  { no: 24, form_no: "受入れ機関説明書", form_name: "受入れ機関が作成した説明書", layer: 1,
+    visa: ["tokkatsu"], appType: ["henko"], sector: null, org: null, category: null, employment: null },
+
+  // ===== 第1表 (チェックリスト) =====
+  { no: 25, form_no: "第1表（特定技能1号・認定用）", form_name: "「特定技能１号」に係る提出書類一覧表", layer: 1,
+    visa: ["tokutei1"], appType: ["nintei"], sector: null, org: null, category: null, employment: null },
+  { no: 26, form_no: "第1表（特定技能1号・変更用）", form_name: "「特定技能１号」に係る提出書類一覧表", layer: 1,
+    visa: ["tokutei1"], appType: ["henko"], sector: null, org: null, category: null, employment: null },
+  { no: 27, form_no: "第1表（特定技能1号・更新用）", form_name: "「特定技能１号」に係る提出書類一覧表", layer: 1,
+    visa: ["tokutei1"], appType: ["koshin"], sector: null, org: null, category: null, employment: null },
+  { no: 28, form_no: "第1表（特定技能2号・認定用）", form_name: "「特定技能２号」に係る提出書類一覧表", layer: 1,
+    visa: ["tokutei2"], appType: ["nintei"], sector: null, org: null, category: null, employment: null },
+  { no: 29, form_no: "第1表（特定技能2号・変更用）", form_name: "「特定技能２号」に係る提出書類一覧表", layer: 1,
+    visa: ["tokutei2"], appType: ["henko"], sector: null, org: null, category: null, employment: null },
+  { no: 30, form_no: "第1表（特定技能2号・更新用）", form_name: "「特定技能２号」に係る提出書類一覧表", layer: 1,
+    visa: ["tokutei2"], appType: ["koshin"], sector: null, org: null, category: null, employment: null },
+
+  // ===== 第2表 (機関書類) =====
+  { no: 31, form_no: "第2表の1", form_name: "所属機関に関する必要書類（一定の実績があり適正な受入れが見込まれる機関）", layer: 2,
+    visa: ["tokutei1", "tokutei2"], appType: ["nintei", "henko"], sector: null, org: null, category: ["1", "2"], employment: null },
+  { no: 32, form_no: "第2表の2", form_name: "所属機関に関する必要書類（特定技能１号・法人）", layer: 2,
+    visa: ["tokutei1", "tokutei2"], appType: ["nintei", "henko"], sector: null, org: ["hojin"], category: ["3", "4"], employment: null },
+  { no: 33, form_no: "第2表の3", form_name: "所属機関に関する必要書類（特定技能１号・個人事業主）", layer: 2,
+    visa: ["tokutei1", "tokutei2"], appType: ["nintei", "henko"], sector: null, org: ["kojin"], category: ["3", "4"], employment: null },
+
+  // ===== 分野参考様式 =====
+  { no: 34, form_no: "分野参考様式第1-1号", form_name: "介護分野における特定技能外国人の受入れに関する誓約書", layer: 3,
+    visa: ["tokutei1", "tokutei2"], appType: ["nintei", "henko"], sector: ["kaigo"], org: null, category: null, employment: null },
+  { no: 35, form_no: "分野参考様式第1-2号", form_name: "介護分野における業務を行わせる事業所の概要書", layer: 3,
+    visa: ["tokutei1", "tokutei2"], appType: ["nintei", "henko", "koshin"], sector: ["kaigo"], org: null, category: null, employment: null },
+  { no: 36, form_no: "分野参考様式第2-1号", form_name: "ビルクリーニング分野における特定技能外国人の受入れに関する誓約書", layer: 3,
+    visa: ["tokutei1", "tokutei2"], appType: ["nintei", "henko"], sector: ["building"], org: null, category: null, employment: null },
+  { no: 37, form_no: "分野参考様式第3-1号", form_name: "工業製品製造業分野における特定技能外国人の受入れに関する誓約書", layer: 3,
+    visa: ["tokutei1", "tokutei2"], appType: ["nintei", "henko"], sector: ["manufacturing"], org: null, category: null, employment: null },
+  { no: 38, form_no: "分野参考様式第3-1号（新様式）", form_name: "工業製品製造業分野における特定技能外国人の受入れに関する誓約書", layer: 3,
+    visa: ["tokutei1", "tokutei2"], appType: ["nintei", "henko", "koshin"], sector: ["manufacturing"], org: null, category: null, employment: null },
+  { no: 39, form_no: "分野参考様式第3-2号", form_name: "工業製品製造業分野２号特定技能外国人に求められる実務経験に係る証明書", layer: 3,
+    visa: ["tokutei2"], appType: ["nintei", "henko"], sector: ["manufacturing"], org: null, category: null, employment: null },
+  { no: 40, form_no: "分野参考様式第10-1号", form_name: "宿泊分野における特定技能外国人の受入れに関する誓約書（特定技能所属機関）", layer: 3,
+    visa: ["tokutei1", "tokutei2"], appType: ["nintei", "henko"], sector: ["accommodation"], org: null, category: null, employment: null },
+  { no: 41, form_no: "分野参考様式第10-2号", form_name: "宿泊分野における特定技能外国人の受入れに関する誓約書（登録支援機関）", layer: 3,
+    visa: ["tokutei1"], appType: ["nintei", "henko", "koshin"], sector: ["accommodation"], org: null, category: null, employment: null },
+
+  // 農業分野
+  { no: 42, form_no: "分野参考様式第11-1号", form_name: "農業分野において直接雇用形態で特定技能外国人の受入れを行う特定技能所属機関に係る誓約書", layer: 3,
+    visa: ["tokutei1", "tokutei2"], appType: ["nintei", "henko"], sector: ["agriculture"], org: null, category: null, employment: ["direct"] },
+  { no: 43, form_no: "分野参考様式第11-2号", form_name: "派遣先事業者誓約書", layer: 3,
+    visa: ["tokutei1", "tokutei2"], appType: ["nintei", "henko", "koshin"], sector: ["agriculture"], org: null, category: null, employment: ["dispatch"] },
+  { no: 44, form_no: "分野参考様式第11-3号", form_name: "農業分野において派遣形態で特定技能外国人の受入れを行う特定技能所属機関に係る誓約書", layer: 3,
+    visa: ["tokutei1", "tokutei2"], appType: ["nintei", "henko"], sector: ["agriculture"], org: null, category: null, employment: ["dispatch"] },
+  { no: 45, form_no: "分野参考様式第11-4号", form_name: "登録支援機関誓約書", layer: 3,
+    visa: ["tokutei1"], appType: ["nintei", "henko", "koshin"], sector: ["agriculture"], org: null, category: null, employment: null },
+
+  // 漁業分野
+  { no: 46, form_no: "分野参考様式第12-1号", form_name: "漁業分野における特定技能外国人の受入れに関する誓約書（特定技能所属機関）", layer: 3,
+    visa: ["tokutei1", "tokutei2"], appType: ["nintei", "henko"], sector: ["fishery"], org: null, category: null, employment: ["direct"] },
+  { no: 47, form_no: "分野参考様式第12-2号", form_name: "漁業分野における特定技能外国人の受入れに関する誓約書（登録支援機関）", layer: 3,
+    visa: ["tokutei1"], appType: ["nintei", "henko", "koshin"], sector: ["fishery"], org: null, category: null, employment: null },
+
+  // その他分野
+  { no: 48, form_no: "分野参考様式第13-1号", form_name: "飲食料品製造業分野における特定技能外国人の受入れに関する誓約書（特定技能所属機関）", layer: 3,
+    visa: ["tokutei1", "tokutei2"], appType: ["nintei", "henko"], sector: ["food-manufacturing"], org: null, category: null, employment: null },
+  { no: 49, form_no: "分野参考様式第13-2号", form_name: "飲食料品製造分野における特定技能外国人の受入れに関する誓約書（登録支援機関）", layer: 3,
+    visa: ["tokutei1"], appType: ["nintei", "henko", "koshin"], sector: ["food-manufacturing"], org: null, category: null, employment: null },
+  { no: 50, form_no: "分野参考様式第14-1号", form_name: "外食業分野における特定技能外国人の受入れに関する誓約書（特定技能所属機関）", layer: 3,
+    visa: ["tokutei1", "tokutei2"], appType: ["nintei", "henko"], sector: ["food-service"], org: null, category: null, employment: null },
+  { no: 51, form_no: "分野参考様式第14-2号", form_name: "外食業分野における特定技能外国人の受入れに関する誓約書（登録支援機関）", layer: 3,
+    visa: ["tokutei1"], appType: ["nintei", "henko", "koshin"], sector: ["food-service"], org: null, category: null, employment: null },
+  { no: 52, form_no: "分野参考様式第15-1号", form_name: "自動車運送業分野における特定技能外国人の受入れに関する誓約書（特定技能所属機関）", layer: 3,
+    visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["auto-transport"], org: ["hojin"], category: null, employment: null },
+  { no: 53, form_no: "分野参考様式第15-2号", form_name: "自動車運送業分野における特定技能外国人の受入れに関する誓約書（登録支援機関）", layer: 3,
+    visa: ["tokutei1"], appType: ["nintei", "henko", "koshin"], sector: ["auto-transport"], org: null, category: null, employment: null },
+  { no: 54, form_no: "分野参考様式第16-1号", form_name: "鉄道分野における特定技能外国人の受入れに関する誓約書（特定技能所属機関）", layer: 3,
+    visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["railway"], org: ["hojin"], category: null, employment: null },
+  { no: 55, form_no: "分野参考様式第16-2号", form_name: "鉄道分野における特定技能外国人の受入れに関する誓約書（登録支援機関）", layer: 3,
+    visa: ["tokutei1"], appType: ["nintei", "henko", "koshin"], sector: ["railway"], org: null, category: null, employment: null },
+
+  // ===== 第3表 (特定技能1号・認定・変更用) =====
+  { no: 56, form_no: "第3表の1（特定技能1号・認定・変更用）", form_name: "介護分野に関する必要な書類", layer: 3,
+    visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["kaigo"], org: null, category: null, employment: null },
+  { no: 57, form_no: "第3表の2（特定技能1号・認定・変更用）", form_name: "ビルクリーニング分野に関する必要な書類", layer: 3,
+    visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["building"], org: null, category: null, employment: null },
+  { no: 58, form_no: "第3表の3（特定技能1号・認定・変更用）", form_name: "工業製品製造業分野に関する必要な書類", layer: 3,
+    visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["manufacturing"], org: null, category: null, employment: null },
+  { no: 59, form_no: "第3表の4（特定技能1号・認定・変更用）", form_name: "建設分野に関する必要な書類", layer: 3,
+    visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["construction"], org: null, category: null, employment: null },
+  { no: 60, form_no: "第3表の5（特定技能1号・認定・変更用）", form_name: "造船・舶用工業分野に関する必要な書類", layer: 3,
+    visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["shipbuilding"], org: null, category: null, employment: null },
+  { no: 61, form_no: "第3表の6（特定技能1号・認定・変更用）", form_name: "自動車整備分野に関する必要な書類", layer: 3,
+    visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["auto-maintenance"], org: null, category: null, employment: null },
+  { no: 62, form_no: "第3表の7（特定技能1号・認定・変更用）", form_name: "航空分野に関する必要な書類", layer: 3,
+    visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["aviation"], org: ["hojin"], category: null, employment: null },
+  { no: 63, form_no: "第3表の8（特定技能1号・認定・変更用）", form_name: "宿泊分野に関する必要な書類", layer: 3,
+    visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["accommodation"], org: null, category: null, employment: null },
+  { no: 64, form_no: "第3表の9（特定技能1号・認定・変更用）", form_name: "自動車運送業分野に関する必要な書類", layer: 3,
+    visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["auto-transport"], org: ["hojin"], category: null, employment: null },
+  { no: 65, form_no: "第3表の10（特定技能1号・認定・変更用）", form_name: "鉄道分野に関する必要な書類", layer: 3,
+    visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["railway"], org: ["hojin"], category: null, employment: null },
+
+  // 農業 - 直接雇用/派遣雇用
+  { no: 66, form_no: "第3表の11の1（特定技能1号・認定・変更用）", form_name: "農業分野に関する必要な書類（直接雇用）", layer: 3,
+    visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["agriculture"], org: null, category: null, employment: ["direct"] },
+  { no: 67, form_no: "第3表の11の2（特定技能1号・認定・変更用）", form_name: "農業分野に関する必要な書類（法人派遣雇用）", layer: 3,
+    visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["agriculture"], org: ["hojin"], category: null, employment: ["dispatch"] },
+  { no: 68, form_no: "第3表の11の3（特定技能1号・認定・変更用）", form_name: "農業分野に関する必要な書類（個人事業主派遣雇用）", layer: 3,
+    visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["agriculture"], org: ["kojin"], category: null, employment: ["dispatch"] },
+
+  // 漁業 - 直接雇用/派遣雇用
+  { no: 69, form_no: "第3表の12の1（特定技能1号・認定・変更用）", form_name: "漁業分野に関する必要な書類（直接雇用）", layer: 3,
+    visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["fishery"], org: null, category: null, employment: ["direct"] },
+  { no: 70, form_no: "第3表の12の2（特定技能1号・認定・変更用）", form_name: "漁業分野に関する必要な書類（法人派遣雇用）", layer: 3,
+    visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["fishery"], org: ["hojin"], category: null, employment: ["dispatch"] },
+  { no: 71, form_no: "第3表の12の3（特定技能1号・認定・変更用）", form_name: "漁業分野に関する必要な書類（個人事業主派遣雇用）", layer: 3,
+    visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["fishery"], org: ["kojin"], category: null, employment: ["dispatch"] },
+
+  { no: 72, form_no: "第3表の13（特定技能1号・認定・変更用）", form_name: "飲食料品製造業分野に関する必要な書類", layer: 3,
+    visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["food-manufacturing"], org: null, category: null, employment: null },
+  { no: 73, form_no: "第3表の14（特定技能1号・認定・変更用）", form_name: "外食業分野に関する必要な書類", layer: 3,
+    visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["food-service"], org: null, category: null, employment: null },
+  { no: 74, form_no: "第3表の15（特定技能1号・認定・変更用）", form_name: "林業分野に関する必要な書類", layer: 3,
+    visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["forestry"], org: null, category: null, employment: null },
+  { no: 75, form_no: "第3表の16（特定技能1号・認定・変更用）", form_name: "木材産業分野に関する必要な書類", layer: 3,
+    visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["wood"], org: null, category: null, employment: null },
+
+  // ===== 第3表 (特定技能1号・更新用) =====
+  { no: 76, form_no: "第3表の1（特定技能1号・更新用）", form_name: "分野に関する必要書類（農業分野及び漁業分野を除く）", layer: 3,
+    visa: ["tokutei1"], appType: ["koshin"], sector: ["kaigo", "building", "manufacturing", "construction", "shipbuilding", "auto-maintenance", "aviation", "accommodation", "food-manufacturing", "food-service", "auto-transport", "railway", "forestry", "wood"], org: null, category: null, employment: null },
+  { no: 77, form_no: "第3表の2の1（特定技能1号・更新用）", form_name: "農業分野に関する必要な書類（直接雇用）", layer: 3,
+    visa: ["tokutei1"], appType: ["koshin"], sector: ["agriculture"], org: null, category: null, employment: ["direct"] },
+  { no: 78, form_no: "第3表の2の2（特定技能1号・更新用）", form_name: "農業分野に関する必要な書類（法人派遣雇用）", layer: 3,
+    visa: ["tokutei1"], appType: ["koshin"], sector: ["agriculture"], org: ["hojin"], category: null, employment: ["dispatch"] },
+  { no: 79, form_no: "第3表の2の3（特定技能1号・更新用）", form_name: "農業分野に関する必要な書類（個人事業主派遣雇用）", layer: 3,
+    visa: ["tokutei1"], appType: ["koshin"], sector: ["agriculture"], org: ["kojin"], category: null, employment: ["dispatch"] },
+  { no: 80, form_no: "第3表の3の1（特定技能1号・更新用）", form_name: "漁業分野に関する必要な書類（直接雇用）", layer: 3,
+    visa: ["tokutei1"], appType: ["koshin"], sector: ["fishery"], org: null, category: null, employment: ["direct"] },
+  { no: 81, form_no: "第3表の3の2（特定技能1号・更新用）", form_name: "漁業分野に関する必要な書類（法人派遣雇用）", layer: 3,
+    visa: ["tokutei1"], appType: ["koshin"], sector: ["fishery"], org: ["hojin"], category: null, employment: ["dispatch"] },
+  { no: 82, form_no: "第3表の3の3（特定技能1号・更新用）", form_name: "漁業分野に関する必要な書類（個人事業主派遣雇用）", layer: 3,
+    visa: ["tokutei1"], appType: ["koshin"], sector: ["fishery"], org: ["kojin"], category: null, employment: ["dispatch"] },
+
+  // ===== 第3表 (特定技能2号・認定・変更用) =====
+  { no: 83, form_no: "第3表の1（特定技能2号・認定・変更用）", form_name: "ビルクリーニング分野に関する必要な書類", layer: 3,
+    visa: ["tokutei2"], appType: ["nintei", "henko"], sector: ["building"], org: null, category: null, employment: null },
+  { no: 84, form_no: "第3表の2（特定技能2号・認定・変更用）", form_name: "工業製品製造業分野に関する必要な書類", layer: 3,
+    visa: ["tokutei2"], appType: ["nintei", "henko"], sector: ["manufacturing"], org: null, category: null, employment: null },
+  { no: 85, form_no: "第3表の3（特定技能2号・認定・変更用）", form_name: "建設分野に関する必要な書類", layer: 3,
+    visa: ["tokutei2"], appType: ["nintei", "henko"], sector: ["construction"], org: null, category: null, employment: null },
+  { no: 86, form_no: "第3表の4（特定技能2号・認定・変更用）", form_name: "造船・舶用工業分野に関する必要な書類", layer: 3,
+    visa: ["tokutei2"], appType: ["nintei", "henko"], sector: ["shipbuilding"], org: null, category: null, employment: null },
+  { no: 87, form_no: "第3表の5（特定技能2号・認定・変更用）", form_name: "自動車整備分野に関する必要な書類", layer: 3,
+    visa: ["tokutei2"], appType: ["nintei", "henko"], sector: ["auto-maintenance"], org: null, category: null, employment: null },
+  { no: 88, form_no: "第3表の6（特定技能2号・認定・変更用）", form_name: "航空分野に関する必要な書類", layer: 3,
+    visa: ["tokutei2"], appType: ["nintei", "henko"], sector: ["aviation"], org: ["hojin"], category: null, employment: null },
+  { no: 89, form_no: "第3表の7（特定技能2号・認定・変更用）", form_name: "宿泊分野に関する必要な書類", layer: 3,
+    visa: ["tokutei2"], appType: ["nintei", "henko"], sector: ["accommodation"], org: null, category: null, employment: null },
+  { no: 90, form_no: "第3表の8の1（特定技能2号・認定・変更用）", form_name: "農業分野に関する必要な書類（直接雇用）", layer: 3,
+    visa: ["tokutei2"], appType: ["nintei", "henko"], sector: ["agriculture"], org: null, category: null, employment: ["direct"] },
+  { no: 91, form_no: "第3表の8の2（特定技能2号・認定・変更用）", form_name: "農業分野に関する必要な書類（法人派遣雇用）", layer: 3,
+    visa: ["tokutei2"], appType: ["nintei", "henko"], sector: ["agriculture"], org: ["hojin"], category: null, employment: ["dispatch"] },
+  { no: 92, form_no: "第3表の8の3（特定技能2号・認定・変更用）", form_name: "農業分野に関する必要な書類（個人事業主派遣雇用）", layer: 3,
+    visa: ["tokutei2"], appType: ["nintei", "henko"], sector: ["agriculture"], org: ["kojin"], category: null, employment: ["dispatch"] },
+  { no: 93, form_no: "第3表の9の1（特定技能2号・認定・変更用）", form_name: "漁業分野に関する必要な書類（直接雇用）", layer: 3,
+    visa: ["tokutei2"], appType: ["nintei", "henko"], sector: ["fishery"], org: null, category: null, employment: ["direct"] },
+  { no: 94, form_no: "第3表の9の2（特定技能2号・認定・変更用）", form_name: "漁業分野に関する必要な書類（法人派遣雇用）", layer: 3,
+    visa: ["tokutei2"], appType: ["nintei", "henko"], sector: ["fishery"], org: ["hojin"], category: null, employment: ["dispatch"] },
+  { no: 95, form_no: "第3表の9の3（特定技能2号・認定・変更用）", form_name: "漁業分野に関する必要な書類（個人事業主派遣雇用）", layer: 3,
+    visa: ["tokutei2"], appType: ["nintei", "henko"], sector: ["fishery"], org: ["kojin"], category: null, employment: ["dispatch"] },
+  { no: 96, form_no: "第3表の10（特定技能2号・認定・変更用）", form_name: "飲食料品製造業分野に関する必要な書類", layer: 3,
+    visa: ["tokutei2"], appType: ["nintei", "henko"], sector: ["food-manufacturing"], org: null, category: null, employment: null },
+  { no: 97, form_no: "第3表の11（特定技能2号・認定・変更用）", form_name: "外食業分野に関する必要な書類", layer: 3,
+    visa: ["tokutei2"], appType: ["nintei", "henko"], sector: ["food-service"], org: null, category: null, employment: null },
+
+  // ===== 第3表 (特定技能2号・更新用) =====
+  { no: 98, form_no: "第3表の1（特定技能2号・更新用）", form_name: "分野に関する必要書類（農業分野及び漁業分野を除く）", layer: 3,
+    visa: ["tokutei2"], appType: ["koshin"], sector: ["building", "manufacturing", "construction", "shipbuilding", "auto-maintenance", "aviation", "accommodation", "food-manufacturing", "food-service"], org: null, category: null, employment: null },
+  { no: 99, form_no: "第3表の2の1（特定技能2号・更新用）", form_name: "農業分野に関する必要な書類（直接雇用）", layer: 3,
+    visa: ["tokutei2"], appType: ["koshin"], sector: ["agriculture"], org: null, category: null, employment: ["direct"] },
+  { no: 100, form_no: "第3表の2の2（特定技能2号・更新用）", form_name: "農業分野に関する必要な書類（法人派遣雇用）", layer: 3,
+    visa: ["tokutei2"], appType: ["koshin"], sector: ["agriculture"], org: ["hojin"], category: null, employment: ["dispatch"] },
+  { no: 101, form_no: "第3表の2の3（特定技能2号・更新用）", form_name: "農業分野に関する必要な書類（個人事業主派遣雇用）", layer: 3,
+    visa: ["tokutei2"], appType: ["koshin"], sector: ["agriculture"], org: ["kojin"], category: null, employment: ["dispatch"] },
+  { no: 102, form_no: "第3表の3の1（特定技能2号・更新用）", form_name: "漁業分野に関する必要な書類（直接雇用）", layer: 3,
+    visa: ["tokutei2"], appType: ["koshin"], sector: ["fishery"], org: null, category: null, employment: ["direct"] },
+  { no: 103, form_no: "第3表の3の2（特定技能2号・更新用）", form_name: "漁業分野に関する必要な書類（法人派遣雇用）", layer: 3,
+    visa: ["tokutei2"], appType: ["koshin"], sector: ["fishery"], org: ["hojin"], category: null, employment: ["dispatch"] },
+  { no: 104, form_no: "第3表の3の3（特定技能2号・更新用）", form_name: "漁業分野に関する必要な書類（個人事業主派遣雇用）", layer: 3,
+    visa: ["tokutei2"], appType: ["koshin"], sector: ["fishery"], org: ["kojin"], category: null, employment: ["dispatch"] },
+
+  // ===== 派遣用書類 (Layer 4) =====
+  { no: 105, form_no: "参考様式第1-12号", form_name: "派遣計画書", layer: 4,
+    visa: ["tokutei1", "tokutei2"], appType: ["nintei", "henko", "koshin"], sector: ["agriculture", "fishery"], org: null, category: null, employment: ["dispatch"] },
+  { no: 106, form_no: "参考様式第1-14号", form_name: "派遣先の概要書（農業分野）", layer: 4,
+    visa: ["tokutei1", "tokutei2"], appType: ["nintei", "henko", "koshin"], sector: ["agriculture"], org: null, category: null, employment: ["dispatch"] },
+  { no: 107, form_no: "参考様式第1-15号", form_name: "派遣先の概要書（漁業分野）", layer: 4,
+    visa: ["tokutei1", "tokutei2"], appType: ["nintei", "henko", "koshin"], sector: ["fishery"], org: null, category: null, employment: ["dispatch"] },
+];
