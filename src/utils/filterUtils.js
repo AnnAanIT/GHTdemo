@@ -231,12 +231,12 @@ export function getFormsFromEnabledLayers(formsData, filters) {
 
   // Layer 1: enabled when visa selected
   if (isLayerEnabled(1, filters)) enabledLayers.push(1);
-  // Layer 2: enabled when visa selected (don't require org/category to be set)
-  if (isLayerEnabled(2, filters)) enabledLayers.push(2);
-  // Layer 3: enabled when tokutei (don't require sector to be set)
-  if (isLayerEnabled(3, filters)) enabledLayers.push(3);
-  // Layer 4: enabled when tokutei + agri/fishery (don't require employment to be set)
-  if (isLayerEnabled(4, filters)) enabledLayers.push(4);
+  // Layer 2: enabled when visa selected AND org or category has been chosen
+  if (isLayerEnabled(2, filters) && (filters.org || filters.category)) enabledLayers.push(2);
+  // Layer 3: enabled when tokutei AND sector has been chosen
+  if (isLayerEnabled(3, filters) && filters.sector) enabledLayers.push(3);
+  // Layer 4: enabled when tokutei + agri/fishery AND employment has been chosen
+  if (isLayerEnabled(4, filters) && filters.employment) enabledLayers.push(4);
 
   if (enabledLayers.length === 0 && filters.visa) {
     enabledLayers.push(1);

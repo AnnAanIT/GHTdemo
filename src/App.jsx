@@ -5,9 +5,22 @@ import { formsData } from './data/formsData';
 import { filterForms, getAutoCheckedForms, mergeCheckedState, getFormsFromEnabledLayers } from './utils/filterUtils';
 import './styles/App.css';
 
+const STORAGE_KEY = 'shinsei-shorui-data';
+
+function loadSavedData() {
+  try {
+    const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    return data || null;
+  } catch {
+    return null;
+  }
+}
+
 function App() {
+  const saved = loadSavedData();
+
   // Filter state
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState(saved?.filters || {
     visa: '',
     appType: '',
     org: '',
@@ -18,7 +31,7 @@ function App() {
   });
 
   // Manual overrides - tracks user's manual changes (true = added, false = removed)
-  const [manualOverrides, setManualOverrides] = useState({});
+  const [manualOverrides, setManualOverrides] = useState(saved?.manualOverrides || {});
 
   // Show additional forms toggle (forms not matching filter but can be added)
   const [showAdditional, setShowAdditional] = useState(false);
@@ -47,11 +60,31 @@ function App() {
     return getFormsFromEnabledLayers(formsData, filters);
   }, [filteredForms, showAdditional, filters]);
 
+  // Clean up stale manual overrides when filters change
+  useEffect(() => {
+    setManualOverrides(prev => {
+      if (Object.keys(prev).length === 0) return prev;
+
+      const validForms = getFormsFromEnabledLayers(formsData, filters);
+      const validFormNos = new Set(validForms.map(f => f.no));
+
+      const cleaned = {};
+      let changed = false;
+      Object.entries(prev).forEach(([formNo, value]) => {
+        if (validFormNos.has(parseInt(formNo))) {
+          cleaned[formNo] = value;
+        } else {
+          changed = true;
+        }
+      });
+
+      return changed ? cleaned : prev;
+    });
+  }, [filters]);
+
   // Handle filter change
   const handleFilterChange = useCallback((newFilters) => {
     setFilters(newFilters);
-    // Reset manual overrides when filter changes (optional - can be removed if you want to keep overrides)
-    // setManualOverrides({});
   }, []);
 
   // Handle search
@@ -90,10 +123,13 @@ function App() {
       .filter(([_, checked]) => checked)
       .map(([no]) => parseInt(no));
 
-    console.log('Saved forms:', selectedForms);
-    console.log('Manual overrides:', manualOverrides);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      filters: { ...filters, searchText: '' },
+      manualOverrides,
+    }));
+
     alert(`保存しました。選択件数: ${selectedForms.length}件`);
-  }, [checkedItems, manualOverrides]);
+  }, [checkedItems, manualOverrides, filters]);
 
   return (
     <div className="container">
