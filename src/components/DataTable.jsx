@@ -2,7 +2,15 @@ import React, { useState, useMemo } from 'react';
 import { layerNames } from '../data/formsData';
 import { groupByLayer, getLayerDescription } from '../utils/filterUtils';
 
-const DataTable = ({ forms, showWarning, checkedItems, onCheckChange }) => {
+const DataTable = ({
+  forms,
+  showWarning,
+  checkedItems,
+  autoCheckedForms,
+  onCheckChange,
+  showAdditional,
+  onToggleAdditional
+}) => {
   const [viewMode, setViewMode] = useState('all'); // 'all', 'checked', 'unchecked'
 
   // Group forms by layer
@@ -32,34 +40,37 @@ const DataTable = ({ forms, showWarning, checkedItems, onCheckChange }) => {
     return { checked, unchecked, total: forms.length };
   }, [forms, checkedItems]);
 
-  // Select all visible forms
+  // Select all visible forms - now calls onCheckChange per form
   const handleSelectAll = () => {
-    const newChecked = { ...checkedItems };
     forms.forEach((form) => {
       if (viewMode === 'all' || (viewMode === 'unchecked' && !checkedItems[form.no])) {
-        newChecked[form.no] = true;
+        if (!checkedItems[form.no]) {
+          onCheckChange(form.no, true);
+        }
       }
     });
-    onCheckChange(newChecked);
   };
 
   // Deselect all visible forms
   const handleDeselectAll = () => {
-    const newChecked = { ...checkedItems };
     forms.forEach((form) => {
       if (viewMode === 'all' || (viewMode === 'checked' && checkedItems[form.no])) {
-        newChecked[form.no] = false;
+        if (checkedItems[form.no]) {
+          onCheckChange(form.no, false);
+        }
       }
     });
-    onCheckChange(newChecked);
   };
 
-  // Toggle single checkbox
+  // Toggle single checkbox - now passes formNo and new state
   const handleToggle = (formNo) => {
-    onCheckChange({
-      ...checkedItems,
-      [formNo]: !checkedItems[formNo],
-    });
+    const newState = !checkedItems[formNo];
+    onCheckChange(formNo, newState);
+  };
+
+  // Check if form is auto-checked (from filter) vs manually added
+  const isAutoChecked = (formNo) => {
+    return autoCheckedForms && autoCheckedForms[formNo];
   };
 
   // Update result counts in DOM
@@ -87,23 +98,31 @@ const DataTable = ({ forms, showWarning, checkedItems, onCheckChange }) => {
               className={`view-toggle-btn ${viewMode === 'all' ? 'active' : ''}`}
               onClick={() => setViewMode('all')}
             >
-              全て表示
+              全て ({counts.total})
             </button>
             <button
               className={`view-toggle-btn ${viewMode === 'checked' ? 'active' : ''}`}
               onClick={() => setViewMode('checked')}
             >
-              選択のみ
+              選択のみ ({counts.checked})
             </button>
             <button
               className={`view-toggle-btn ${viewMode === 'unchecked' ? 'active' : ''}`}
               onClick={() => setViewMode('unchecked')}
             >
-              未選択のみ
+              未選択のみ ({counts.unchecked})
             </button>
           </div>
         </div>
         <div className="table-actions">
+          <label className="additional-toggle">
+            <input
+              type="checkbox"
+              checked={showAdditional}
+              onChange={onToggleAdditional}
+            />
+            追加表示
+          </label>
           <button className="btn-select-action check-all" onClick={handleSelectAll}>
             全選択
           </button>
@@ -156,10 +175,14 @@ const DataTable = ({ forms, showWarning, checkedItems, onCheckChange }) => {
               {/* Layer Forms */}
               {visibleForms.map((form, idx) => {
                 const isChecked = checkedItems[form.no] || false;
+                const isAuto = isAutoChecked(form.no);
+                const isManuallyAdded = isChecked && !isAuto;
+                const isManuallyRemoved = !isChecked && isAuto;
+
                 return (
                   <div
                     key={form.no}
-                    className={`table-row ${!isChecked ? 'unchecked' : ''}`}
+                    className={`table-row ${!isChecked ? 'unchecked' : ''} ${isManuallyAdded ? 'manually-added' : ''} ${isManuallyRemoved ? 'manually-removed' : ''}`}
                   >
                     <div className="col-no">{idx + 1}</div>
                     <div className="col-required">
@@ -169,6 +192,8 @@ const DataTable = ({ forms, showWarning, checkedItems, onCheckChange }) => {
                           checked={isChecked}
                           onChange={() => handleToggle(form.no)}
                         />
+                        {isManuallyAdded && <span className="manual-badge add">+</span>}
+                        {isManuallyRemoved && <span className="manual-badge remove">-</span>}
                       </div>
                     </div>
                     <div className="col-form-no">{form.form_no}</div>

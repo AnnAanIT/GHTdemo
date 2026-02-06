@@ -1,0 +1,1991 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>申請書類管理 - マスタデータ設定</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Custom scrollbar for Japanese-style clean look */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f0f0f0;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #aaa;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            background-color: #f5f6f8;
+            color: #333;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 16px 20px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .page-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .page-title::before {
+            content: '';
+            display: inline-block;
+            width: 3px;
+            height: 20px;
+            background: #333;
+            border-radius: 2px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-save, .btn-load {
+            padding: 7px 20px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-save {
+            background: #FFF8DC;
+            border: 2px dashed #ccc;
+            color: #333;
+        }
+
+        .btn-save:hover {
+            background: #FFF3C4;
+            border-color: #bbb;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .btn-load {
+            background: #f0f8fa;
+            border: 1px solid #4A9BAD;
+            color: #4A9BAD;
+        }
+
+        .btn-load:hover {
+            background: #e0f2f5;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 2px;
+            margin-bottom: 14px;
+        }
+
+        .tab {
+            padding: 8px 18px;
+            border-radius: 4px 4px 0 0;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .tab.primary {
+            background: #4A9BAD;
+            color: white;
+        }
+
+        .tab.secondary {
+            background: #5AABB8;
+            color: white;
+        }
+
+        .tab.active {
+            background: #E08050;
+            color: white;
+        }
+
+        .tab:hover {
+            opacity: 0.9;
+        }
+
+        .filter-section {
+            background: white;
+            border-radius: 6px;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            border: 1px solid #e0e0e0;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #4A9BAD;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e8e8e8;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s;
+        }
+
+        .section-title:hover {
+            color: #5AABB8;
+        }
+
+        .section-title::before {
+            content: '▼';
+            font-size: 8px;
+            color: #E08050;
+            transition: transform 0.3s ease;
+        }
+
+        .section-title.collapsed::before {
+            transform: rotate(-90deg);
+        }
+
+        .filter-content {
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+            max-height: 600px;
+            opacity: 1;
+        }
+
+        .filter-content.collapsed {
+            max-height: 0;
+            opacity: 0;
+            margin: 0;
+        }
+
+        .filter-section.collapsed .filter-layers,
+        .filter-section.collapsed .action-bar {
+            display: none;
+        }
+
+        .collapse-hint {
+            font-size: 10px;
+            font-weight: 400;
+            color: #999;
+            margin-left: auto;
+        }
+
+        .filter-layers {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-layer {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: 6px;
+            background: #fafafa;
+            border: 1px solid #e8e8e8;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .filter-layer::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            width: 2px;
+            height: 8px;
+            background: #ddd;
+        }
+
+        /* L1, L2, L3: siblings under L0 - connector at same position */
+        .filter-layer.layer-1::before,
+        .filter-layer.layer-2::before,
+        .filter-layer.layer-3::before {
+            left: 14px;
+        }
+
+        /* L4: child of L3 - connector indented further */
+        .filter-layer.layer-4::before {
+            left: 14px;
+        }
+
+        .filter-layer.layer-0::before {
+            display: none;
+        }
+
+        .filter-layer:hover:not(.disabled-layer) {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .filter-layer.layer-0 {
+            border-left: 4px solid #3B7A8C;
+            background: linear-gradient(90deg, #f0f7f9 0%, #fafafa 100%);
+        }
+
+        .filter-layer.layer-1 {
+            border-left: 4px solid #4A9BAD;
+            background: linear-gradient(90deg, #f2f9fa 0%, #fafafa 100%);
+            margin-left: 24px;
+        }
+
+        .filter-layer.layer-2 {
+            border-left: 4px solid #5AABB8;
+            background: linear-gradient(90deg, #f4fafb 0%, #fafafa 100%);
+            margin-left: 24px;
+        }
+
+        .filter-layer.layer-3 {
+            border-left: 4px solid #6ABDD4;
+            background: linear-gradient(90deg, #f5fbfc 0%, #fafafa 100%);
+            margin-left: 24px;
+        }
+
+        .filter-layer.layer-4 {
+            border-left: 4px solid #E08050;
+            background: linear-gradient(90deg, #fef8f3 0%, #fafafa 100%);
+            margin-left: 48px;
+        }
+
+        .layer-number {
+            font-size: 9px;
+            font-weight: 700;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .layer-0 .layer-number { background: #3B7A8C; }
+        .layer-1 .layer-number { background: #4A9BAD; }
+        .layer-2 .layer-number { background: #5AABB8; }
+        .layer-3 .layer-number { background: #6ABDD4; }
+        .layer-4 .layer-number { background: #E08050; }
+
+        .layer-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #333;
+            min-width: 80px;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .filter-label {
+            font-size: 11px;
+            color: #666;
+            min-width: 60px;
+            font-weight: 500;
+        }
+
+        .filter-select {
+            position: relative;
+            flex: 1;
+            max-width: 200px;
+        }
+
+        .filter-select select {
+            appearance: none;
+            padding: 7px 28px 7px 10px;
+            border: 1px solid #d0d0d0;
+            border-radius: 4px;
+            background: white;
+            font-size: 12px;
+            width: 100%;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .filter-select::after {
+            content: '▼';
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 8px;
+            color: #888;
+            pointer-events: none;
+        }
+
+        .filter-select select:focus {
+            outline: none;
+            border-color: #4A9BAD;
+            box-shadow: 0 0 0 2px rgba(74, 155, 173, 0.15);
+        }
+
+        .filter-select select:disabled {
+            background: #f5f5f5;
+            color: #999;
+            cursor: not-allowed;
+        }
+
+        .layer-connector {
+            color: #bbb;
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .layer-status {
+            font-size: 9px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-weight: 500;
+            margin-left: auto;
+        }
+
+        .layer-status.required {
+            background: #e8f5f7;
+            color: #3B7A8C;
+        }
+
+        .layer-status.optional {
+            background: #fff8e1;
+            color: #f57c00;
+        }
+
+        .layer-status.locked {
+            background: #f5f5f5;
+            color: #999;
+        }
+
+        .disabled-layer {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .disabled-layer .layer-number {
+            background: #bbb !important;
+        }
+
+        .disabled-layer select {
+            background: #f0f0f0 !important;
+        }
+
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #eee;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .search-box input {
+            padding: 7px 12px;
+            border: 1px solid #d0d0d0;
+            border-radius: 4px;
+            width: 200px;
+            font-size: 12px;
+            font-family: inherit;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #4A9BAD;
+            box-shadow: 0 0 0 2px rgba(74, 155, 173, 0.15);
+        }
+
+        .btn-search {
+            background: #4A9BAD;
+            color: white;
+            border: none;
+            padding: 7px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            font-family: inherit;
+            transition: background 0.2s;
+        }
+
+        .btn-search:hover {
+            background: #5AABB8;
+        }
+
+        .result-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .result-count {
+            font-size: 13px;
+            color: #555;
+        }
+
+        .result-count strong {
+            color: #e67e22;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .result-detail {
+            font-size: 11px;
+            color: #666;
+            padding: 4px 10px;
+            background: #f0f0f0;
+            border-radius: 3px;
+        }
+
+        .filter-summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed #e0e0e0;
+        }
+
+        .filter-summary:empty {
+            display: none;
+        }
+
+        .filter-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            background: #e8f4fc;
+            border: 1px solid #b3d9f2;
+            border-radius: 12px;
+            font-size: 11px;
+            color: #1565c0;
+            font-weight: 500;
+        }
+
+        .table-section {
+            background: white;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            border: 1px solid #e0e0e0;
+        }
+
+        .table-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            background: #fafbfc;
+            border-bottom: 1px solid #e8e8e8;
+        }
+
+        .table-toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .table-toolbar-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 4px;
+        }
+
+        .view-toggle-btn {
+            padding: 5px 12px;
+            font-size: 11px;
+            border: 1px solid #d0d0d0;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .view-toggle-btn:first-child {
+            border-radius: 4px 0 0 4px;
+        }
+
+        .view-toggle-btn:last-child {
+            border-radius: 0 4px 4px 0;
+        }
+
+        .view-toggle-btn.active {
+            background: #4A9BAD;
+            border-color: #4A9BAD;
+            color: white;
+        }
+
+        .view-toggle-btn:hover:not(.active) {
+            background: #f0f0f0;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-select-action {
+            padding: 5px 10px;
+            font-size: 10px;
+            border: 1px solid #d0d0d0;
+            border-radius: 3px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            color: #555;
+        }
+
+        .btn-select-action:hover {
+            background: #f5f5f5;
+            border-color: #bbb;
+        }
+
+        .btn-select-action.check-all {
+            border-color: #4A9BAD;
+            color: #4A9BAD;
+        }
+
+        .btn-select-action.check-all:hover {
+            background: #e8f5f7;
+        }
+
+        .btn-select-action.uncheck-all {
+            border-color: #C0836A;
+            color: #C0836A;
+        }
+
+        .btn-select-action.uncheck-all:hover {
+            background: #fef5f0;
+        }
+
+        .extra-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            background: #fff;
+            border: 1px solid #E08050;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            color: #E08050;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .extra-toggle:hover {
+            background: #fef8f3;
+        }
+
+        .extra-toggle input[type="checkbox"] {
+            accent-color: #E08050;
+        }
+
+        .extra-toggle input[type="checkbox"]:checked + span {
+            color: #c0603a;
+        }
+
+        .table-header {
+            display: grid;
+            grid-template-columns: 45px 55px 1fr 100px 120px;
+            background: linear-gradient(180deg, #8CD4E8 0%, #7CC8DC 100%);
+            border-bottom: 2px solid #6ABDD4;
+            font-weight: 600;
+            font-size: 11px;
+            color: #2c3e50;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .table-header > div {
+            padding: 12px 8px;
+            text-align: center;
+            border-right: 1px solid rgba(255,255,255,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .table-header > div:last-child {
+            border-right: none;
+        }
+
+        .table-body {
+            max-height: 450px;
+            overflow-y: auto;
+        }
+
+        .table-row.hidden {
+            display: none;
+        }
+
+        .table-row {
+            display: grid;
+            grid-template-columns: 45px 55px 1fr 100px 120px;
+            border-bottom: 1px solid #eee;
+            transition: all 0.15s;
+        }
+
+        .table-row:hover {
+            background: #f0f8fa;
+        }
+
+        .table-row:nth-child(even) {
+            background: #f9fafb;
+        }
+
+        .table-row:nth-child(even):hover {
+            background: #f0f8fa;
+        }
+
+        .table-row.unchecked {
+            background: #fef8f3;
+        }
+
+        .table-row.unchecked:hover {
+            background: #fef5ed;
+        }
+
+        .table-row > div {
+            padding: 10px 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-right: 1px solid #f0f0f0;
+            font-size: 11px;
+        }
+
+        .table-row > div:last-child {
+            border-right: none;
+        }
+
+        .table-row > div:first-child {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .table-row > div.form-name {
+            justify-content: flex-start;
+            padding-left: 10px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 2px;
+        }
+
+        .form-name-main {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+        }
+
+        .form-name-sub {
+            font-size: 10px;
+            color: #777;
+            padding-left: 42px;
+        }
+
+        .checkbox-wrapper {
+            position: relative;
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #ccc;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .checkbox-wrapper input[type="checkbox"]:hover {
+            border-color: #4A9BAD;
+            box-shadow: 0 0 0 2px rgba(74, 155, 173, 0.1);
+        }
+
+        .checkbox-wrapper input[type="checkbox"]:checked {
+            background: #4A9BAD;
+            border-color: #4A9BAD;
+        }
+
+        .checkbox-wrapper input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .checkbox-wrapper input[type="checkbox"]:not(:checked) {
+            background: #fef8f3;
+            border-color: #D4A88C;
+        }
+
+        .checkbox-wrapper input[type="checkbox"]:not(:checked):hover {
+            border-color: #c0c0c0;
+            background: white;
+        }
+
+        .layer-badge {
+            font-size: 8px;
+            padding: 2px 5px;
+            border-radius: 2px;
+            color: white;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .layer-badge.l0 { background: #3B7A8C; }
+        .layer-badge.l1 { background: #4A9BAD; }
+        .layer-badge.l2 { background: #5AABB8; }
+        .layer-badge.l3 { background: #6ABDD4; }
+        .layer-badge.l4 { background: #E08050; }
+
+        .legend {
+            display: flex;
+            gap: 16px;
+            margin-top: 12px;
+            padding: 10px 16px;
+            background: white;
+            border-radius: 6px;
+            font-size: 11px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .legend-title {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #666;
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        .legend-dot.l0 { background: #3B7A8C; }
+        .legend-dot.l1 { background: #4A9BAD; }
+        .legend-dot.l2 { background: #5AABB8; }
+        .legend-dot.l3 { background: #6ABDD4; }
+        .legend-dot.l4 { background: #E08050; }
+
+        .layer-group-header {
+            background: linear-gradient(90deg, #f0f4f8 0%, #f8f9fa 100%);
+            padding: 8px 14px;
+            font-weight: 600;
+            font-size: 11px;
+            color: #444;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: sticky;
+            top: 38px;
+            z-index: 5;
+        }
+
+        .layer-group-header.l0 {
+            border-left: 4px solid #3B7A8C;
+            background: linear-gradient(90deg, #eef5f7 0%, #f8f9fa 100%);
+        }
+        .layer-group-header.l1 {
+            border-left: 4px solid #4A9BAD;
+            background: linear-gradient(90deg, #eff7f9 0%, #f8f9fa 100%);
+        }
+        .layer-group-header.l2 {
+            border-left: 4px solid #5AABB8;
+            background: linear-gradient(90deg, #f0f8fa 0%, #f8f9fa 100%);
+        }
+        .layer-group-header.l3 {
+            border-left: 4px solid #6ABDD4;
+            background: linear-gradient(90deg, #f0f9fb 0%, #f8f9fa 100%);
+        }
+        .layer-group-header.l4 {
+            border-left: 4px solid #E08050;
+            background: linear-gradient(90deg, #fef5ee 0%, #f8f9fa 100%);
+        }
+
+        .layer-group-count {
+            margin-left: auto;
+            font-size: 10px;
+            color: #888;
+            font-weight: 400;
+        }
+
+        .no-data {
+            padding: 30px;
+            text-align: center;
+            color: #888;
+            font-size: 12px;
+        }
+
+        .filter-warning {
+            background: #FFF8DC;
+            border: 1px solid #E8D5A0;
+            border-left: 4px solid #E08050;
+            padding: 10px 14px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #8B6914;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-warning::before {
+            content: '⚠';
+            font-size: 14px;
+        }
+
+        .setting-mode-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 14px;
+            background: #f0f8fa;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 11px;
+        }
+
+        .setting-mode-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #4A9BAD;
+            font-weight: 600;
+        }
+
+        .setting-mode-label::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: #4A9BAD;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .setting-mode-hint {
+            color: #888;
+            font-size: 10px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 900px) {
+            .filter-layer.layer-0 {
+                margin-left: 0;
+            }
+            .filter-layer.layer-1,
+            .filter-layer.layer-2,
+            .filter-layer.layer-3 {
+                margin-left: 12px !important;
+            }
+            .filter-layer.layer-4 {
+                margin-left: 24px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">申請書類管理</h1>
+            <div class="header-actions">
+                <button class="btn-load" onclick="loadMaster()">マスタ読込</button>
+                <button class="btn-save" onclick="saveMaster()">マスタ保存</button>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <div class="tab primary">申請人書類</div>
+            <div class="tab secondary">所属機関書類</div>
+            <div class="tab active">オンライン作成書類</div>
+        </div>
+
+        <div class="filter-section" id="filterSection">
+            <div class="section-title" onclick="toggleFilter()">
+                絞り込み条件
+                <span class="collapse-hint" id="collapseHint">クリックで折りたたむ</span>
+            </div>
+
+            <div class="filter-content" id="filterContent">
+            <div class="filter-layers">
+                <!-- Layer 0: 在留資格 (Root) -->
+                <div class="filter-layer layer-0" id="layer0">
+                    <span class="layer-number">0</span>
+                    <span class="layer-label">在留資格</span>
+                    <div class="filter-group">
+                        <div class="filter-select">
+                            <select id="visa-type" onchange="onVisaChange()">
+                                <option value="">-- 選択してください --</option>
+                                <option value="tokutei1" selected>特定技能1号</option>
+                                <option value="tokutei2">特定技能2号</option>
+                                <option value="tokkatsu">特定活動</option>
+                                <option value="gijinkoku">技術・人文知識・国際業務</option>
+                            </select>
+                        </div>
+                    </div>
+                    <span class="layer-status required">必須</span>
+                </div>
+
+                <!-- Layer 1: 申請種別 -->
+                <div class="filter-layer layer-1" id="layer1">
+                    <span class="layer-number">1</span>
+                    <span class="layer-label">申請種別</span>
+                    <div class="filter-group">
+                        <div class="filter-select">
+                            <select id="app-type" onchange="onAppTypeChange()">
+                                <option value="">-- 選択してください --</option>
+                                <option value="nintei" selected>認定</option>
+                                <option value="henko">変更</option>
+                                <option value="koshin">更新</option>
+                            </select>
+                        </div>
+                    </div>
+                    <span class="layer-status required">必須</span>
+                </div>
+
+                <!-- Layer 2: 受入機関 + カテゴリー -->
+                <div class="filter-layer layer-2" id="layer2">
+                    <span class="layer-number">2</span>
+                    <span class="layer-label">機関情報</span>
+                    <div class="filter-group">
+                        <span class="filter-label">受入機関</span>
+                        <div class="filter-select">
+                            <select id="org-type" onchange="onOrgChange()">
+                                <option value="">-- 選択 --</option>
+                                <option value="undecided">未定</option>
+                                <option value="hojin" selected>法人</option>
+                                <option value="kojin">個人事業主</option>
+                            </select>
+                        </div>
+                    </div>
+                    <span class="layer-connector">+</span>
+                    <div class="filter-group">
+                        <span class="filter-label">カテゴリー</span>
+                        <div class="filter-select">
+                            <select id="category" onchange="onCategoryChange()">
+                                <option value="">-- 選択 --</option>
+                                <option value="1">カテゴリー1</option>
+                                <option value="2">カテゴリー2</option>
+                                <option value="3" selected>カテゴリー3</option>
+                                <option value="4">カテゴリー4</option>
+                            </select>
+                        </div>
+                    </div>
+                    <span class="layer-status required">必須</span>
+                </div>
+
+                <!-- Layer 3: 分野 (特定技能のみ) -->
+                <div class="filter-layer layer-3 disabled-layer" id="layer3">
+                    <span class="layer-number">3</span>
+                    <span class="layer-label">分野</span>
+                    <div class="filter-group">
+                        <div class="filter-select">
+                            <select id="sector" onchange="onSectorChange()">
+                                <option value="">-- 選択してください --</option>
+                                <option value="kaigo">介護</option>
+                                <option value="building">ビルクリーニング</option>
+                                <option value="manufacturing">工業製品製造業</option>
+                                <option value="construction">建設</option>
+                                <option value="shipbuilding">造船・舶用工業</option>
+                                <option value="auto-maintenance">自動車整備</option>
+                                <option value="aviation">航空</option>
+                                <option value="accommodation">宿泊</option>
+                                <option value="agriculture" selected>農業</option>
+                                <option value="fishery">漁業</option>
+                                <option value="food-manufacturing">飲食料品製造業</option>
+                                <option value="food-service">外食業</option>
+                                <option value="auto-transport">自動車運送業</option>
+                                <option value="railway">鉄道</option>
+                                <option value="forestry">林業</option>
+                                <option value="wood">木材産業</option>
+                            </select>
+                        </div>
+                    </div>
+                    <span class="layer-status locked" id="layer3Status">特定技能のみ</span>
+                </div>
+
+                <!-- Layer 4: 雇用形態 (農業・漁業のみ) -->
+                <div class="filter-layer layer-4 disabled-layer" id="layer4">
+                    <span class="layer-number">4</span>
+                    <span class="layer-label">雇用形態</span>
+                    <div class="filter-group">
+                        <div class="filter-select">
+                            <select id="employment-type" onchange="onEmploymentChange()">
+                                <option value="">-- 選択してください --</option>
+                                <option value="direct" selected>直接雇用</option>
+                                <option value="dispatch">派遣雇用</option>
+                            </select>
+                        </div>
+                    </div>
+                    <span class="layer-status locked" id="layer4Status">農業・漁業のみ</span>
+                </div>
+            </div>
+
+            <div class="action-bar">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="様式名で検索..." onkeyup="applyFilters()">
+                    <button class="btn-search" onclick="applyFilters()">検索</button>
+                </div>
+                <div class="result-info">
+                    <div class="result-count">
+                        該当：<strong id="totalCount">0</strong> 件
+                    </div>
+                    <div class="result-detail" id="checkedCount">
+                        選択：0件 / 未選択：0件
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <div class="filter-summary" id="filterSummary">
+            </div>
+        </div>
+
+        <div class="table-section">
+            <div class="setting-mode-bar">
+                <span class="setting-mode-label">設定モード</span>
+                <span class="setting-mode-hint">チェックを変更して「保存」で確定</span>
+            </div>
+            <div class="table-toolbar">
+                <div class="table-toolbar-left">
+                    <span class="table-toolbar-title">書類一覧</span>
+                    <div class="view-toggle">
+                        <button class="view-toggle-btn" id="viewAll" onclick="toggleView('all')">全て表示</button>
+                        <button class="view-toggle-btn active" id="viewChecked" onclick="toggleView('checked')">選択のみ</button>
+                        <button class="view-toggle-btn" id="viewUnchecked" onclick="toggleView('unchecked')">未選択のみ</button>
+                    </div>
+                </div>
+                <div class="table-actions">
+                    <label class="extra-toggle">
+                        <input type="checkbox" id="showExtraForms" onchange="toggleExtraForms()">
+                        <span>追加表示</span>
+                    </label>
+                    <button class="btn-select-action check-all" onclick="selectAll()">全選択</button>
+                    <button class="btn-select-action uncheck-all" onclick="deselectAll()">全解除</button>
+                </div>
+            </div>
+            <div class="table-header">
+                <div>No.</div>
+                <div>選択</div>
+                <div>様式番号・様式名</div>
+                <div>更新者</div>
+                <div>更新日時</div>
+            </div>
+            <div class="table-body" id="tableBody">
+            </div>
+        </div>
+
+        <div class="legend">
+            <span class="legend-title">書類分類</span>
+            <div class="legend-item">
+                <div class="legend-dot l1"></div>
+                <span>共通書類</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot l2"></div>
+                <span>機関書類</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot l3"></div>
+                <span>分野書類</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot l4"></div>
+                <span>派遣書類</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== MASTER DATA ==========
+        const formsData = [
+            // ===== 第1層：別記様式（申請書）=====
+            // 特定技能用
+            { no: 1, form_no: "別記第6号の3様式", form_name: "申請書（在留資格認定証明書交付申請書）", layer: 1, 
+              visa: ["tokutei1", "tokutei2"], appType: ["nintei"], sector: null, org: null, employment: null },
+            { no: 2, form_no: "別記第30号様式", form_name: "申請書（在留資格変更許可申請書）", layer: 1, 
+              visa: ["tokutei1", "tokutei2"], appType: ["henko"], sector: null, org: null, employment: null },
+            { no: 3, form_no: "別記第30号の2様式", form_name: "申請書（在留期間更新許可申請書）", layer: 1, 
+              visa: ["tokutei1", "tokutei2"], appType: ["koshin"], sector: null, org: null, employment: null },
+            
+            // 特定活動用
+            { no: 4, form_no: "別記第30号様式（特活用）", form_name: "在留資格変更許可申請書", layer: 1, 
+              visa: ["tokkatsu"], appType: ["henko"], sector: null, org: null, employment: null },
+            
+            // インターン用
+            { no: 5, form_no: "別記第6号の3様式（インターン用）", form_name: "在留資格認定証明書交付申請書", layer: 1, 
+              visa: ["tokkatsu"], appType: ["nintei"], sector: null, org: null, employment: null },
+            { no: 6, form_no: "別記第30号様式（インターン用）", form_name: "在留資格変更許可申請書（インターン用）", layer: 1, 
+              visa: ["tokkatsu"], appType: ["henko"], sector: null, org: null, employment: null },
+            { no: 7, form_no: "別記第30号の2様式（インターン用）", form_name: "在留期間更新許可申請書（インターン用）", layer: 1, 
+              visa: ["tokkatsu"], appType: ["koshin"], sector: null, org: null, employment: null },
+            
+            // 技人国用
+            { no: 8, form_no: "別記第6号の3様式（技人国用）", form_name: "在留資格認定証明書交付申請書（技人国用）", layer: 1, 
+              visa: ["gijinkoku"], appType: ["nintei"], sector: null, org: null, employment: null },
+            { no: 9, form_no: "別記第30号様式（技人国用）", form_name: "在留資格変更許可申請書（技人国用）", layer: 1, 
+              visa: ["gijinkoku"], appType: ["henko"], sector: null, org: null, employment: null },
+            { no: 10, form_no: "別記第30号の2様式（技人国用）", form_name: "在留期間更新許可申請書（技人国用）", layer: 1, 
+              visa: ["gijinkoku"], appType: ["koshin"], sector: null, org: null, employment: null },
+
+            // ===== 第1層：参考様式（共通）=====
+            { no: 11, form_no: "参考様式第1-3号", form_name: "健康診断個人票", layer: 1, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: null, org: null, employment: null },
+            { no: 12, form_no: "参考様式第1-3号別紙", form_name: "受診者の申告書", layer: 1, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: null, org: null, employment: null },
+            { no: 13, form_no: "参考様式第1-4号", form_name: "特定技能外国人の報酬に関する説明書", layer: 1, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: null, org: null, employment: null },
+            { no: 14, form_no: "参考様式第1-5号", form_name: "特定技能雇用契約書", layer: 1, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: null, org: null, employment: null },
+            { no: 15, form_no: "参考様式第1-6号", form_name: "雇用条件書", layer: 1, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: null, org: null, employment: null },
+            { no: 16, form_no: "参考様式第1-6号別紙", form_name: "賃金の支払", layer: 1, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: null, org: null, employment: null },
+            { no: 17, form_no: "参考様式第1-10号", form_name: "技能移転に係る申告書", layer: 1, 
+              visa: ["tokutei1"], appType: null, sector: null, org: null, employment: null },
+            { no: 18, form_no: "参考様式第1-11-1号", form_name: "特定技能所属機関概要書", layer: 1, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: null, org: null, employment: null },
+            { no: 19, form_no: "参考様式第1-16号", form_name: "雇用の経緯に係る説明書", layer: 1, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: null, org: null, employment: null },
+            { no: 20, form_no: "参考様式第1-17号", form_name: "１号特定技能外国人支援計画書", layer: 1, 
+              visa: ["tokutei1"], appType: null, sector: null, org: null, employment: null },
+            { no: 21, form_no: "参考様式第1-23号", form_name: "特定技能所属機関の役員に関する誓約書", layer: 1, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: null, org: ["hojin"], employment: null },
+            { no: 22, form_no: "参考様式第1-25号", form_name: "登録支援機関との支援委託契約に関する説明書", layer: 1, 
+              visa: ["tokutei1"], appType: null, sector: null, org: null, employment: null },
+            { no: 23, form_no: "参考様式第1-26号", form_name: "公的義務履行に関する誓約書", layer: 1, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: null, org: null, employment: null },
+            { no: 24, form_no: "参考様式第1-27号", form_name: "公的義務履行に関する説明書", layer: 1, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: null, org: null, employment: null },
+            { no: 25, form_no: "参考様式第1-29号", form_name: "書類省略に当たっての誓約書", layer: 1, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: null, org: null, employment: null },
+
+            // ===== 第1層：第1表（チェックリスト）=====
+            { no: 26, form_no: "第1表（特定技能1号・認定用）", form_name: "「特定技能１号」に係る提出書類一覧表", layer: 1, 
+              visa: ["tokutei1"], appType: ["nintei"], sector: null, org: null, employment: null },
+            { no: 27, form_no: "第1表（特定技能1号・変更用）", form_name: "「特定技能１号」に係る提出書類一覧表", layer: 1, 
+              visa: ["tokutei1"], appType: ["henko"], sector: null, org: null, employment: null },
+            { no: 28, form_no: "第1表（特定技能1号・更新用）", form_name: "「特定技能１号」に係る提出書類一覧表", layer: 1, 
+              visa: ["tokutei1"], appType: ["koshin"], sector: null, org: null, employment: null },
+            { no: 29, form_no: "第1表（特定技能2号・認定用）", form_name: "「特定技能２号」に係る提出書類一覧表", layer: 1, 
+              visa: ["tokutei2"], appType: ["nintei"], sector: null, org: null, employment: null },
+            { no: 30, form_no: "第1表（特定技能2号・変更用）", form_name: "「特定技能２号」に係る提出書類一覧表", layer: 1, 
+              visa: ["tokutei2"], appType: ["henko"], sector: null, org: null, employment: null },
+            { no: 31, form_no: "第1表（特定技能2号・更新用）", form_name: "「特定技能２号」に係る提出書類一覧表", layer: 1, 
+              visa: ["tokutei2"], appType: ["koshin"], sector: null, org: null, employment: null },
+
+            // ===== 第2層：第2表（機関書類）=====
+            { no: 32, form_no: "第2表の1", form_name: "所属機関に関する必要書類（一定の実績があり適正な受入れが見込まれる機関）", layer: 2, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: null, org: null, category: ["1"] },
+            { no: 33, form_no: "第2表の2", form_name: "所属機関に関する必要書類（特定技能１号・法人）", layer: 2, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: null, org: ["hojin"], category: ["2", "3", "4"] },
+            { no: 34, form_no: "第2表の3", form_name: "所属機関に関する必要書類（特定技能１号・個人事業主）", layer: 2, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: null, org: ["kojin"], category: ["2", "3", "4"] },
+
+            // ===== 第3層：分野参考様式 =====
+            { no: 35, form_no: "分野参考様式第1-1号", form_name: "介護分野における特定技能外国人の受入れに関する誓約書", layer: 3, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: ["kaigo"], org: null, employment: null },
+            { no: 36, form_no: "分野参考様式第1-2号", form_name: "介護分野における業務を行わせる事業所の概要書", layer: 3, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: ["kaigo"], org: null, employment: null },
+            { no: 37, form_no: "分野参考様式第2-1号", form_name: "ビルクリーニング分野における特定技能外国人の受入れに関する誓約書", layer: 3, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: ["building"], org: null, employment: null },
+            { no: 38, form_no: "分野参考様式第3-1号", form_name: "工業製品製造業分野における特定技能外国人の受入れに関する誓約書", layer: 3, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: ["manufacturing"], org: null, employment: null },
+            { no: 39, form_no: "分野参考様式第3-2号", form_name: "工業製品製造業分野２号特定技能外国人に求められる実務経験に係る証明書", layer: 3, 
+              visa: ["tokutei2"], appType: ["nintei", "henko"], sector: ["manufacturing"], org: null, employment: null },
+            { no: 40, form_no: "分野参考様式第6-1号", form_name: "建設分野における特定技能外国人の受入れに関する誓約書", layer: 3, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: ["construction"], org: null, employment: null },
+            { no: 41, form_no: "分野参考様式第6-2号", form_name: "建設分野における２号特定技能外国人の基準に関する誓約書", layer: 3, 
+              visa: ["tokutei2"], appType: null, sector: ["construction"], org: null, employment: null },
+            { no: 42, form_no: "分野参考様式第6-3号", form_name: "２号特定技能外国人に求められる実務経験に係る申告書", layer: 3, 
+              visa: ["tokutei2"], appType: ["nintei", "henko"], sector: ["construction"], org: null, employment: null },
+            { no: 43, form_no: "分野参考様式第7-1号", form_name: "造船・舶用工業分野における誓約書（特定技能所属機関）", layer: 3, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: ["shipbuilding"], org: null, employment: null },
+            { no: 44, form_no: "分野参考様式第8-1号", form_name: "自動車整備分野における誓約書（特定技能所属機関）", layer: 3, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: ["auto-maintenance"], org: null, employment: null },
+            { no: 45, form_no: "分野参考様式第9-1号", form_name: "航空分野における誓約書（特定技能所属機関）", layer: 3, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: ["aviation"], org: null, employment: null },
+            { no: 46, form_no: "分野参考様式第10-1号", form_name: "宿泊分野における誓約書（特定技能所属機関）", layer: 3, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: ["accommodation"], org: null, employment: null },
+            
+            // 農業分野
+            { no: 47, form_no: "分野参考様式第11-1号", form_name: "農業分野において直接雇用形態で受入れを行う誓約書", layer: 3, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: ["agriculture"], org: null, employment: ["direct"] },
+            { no: 48, form_no: "分野参考様式第11-2号", form_name: "派遣先事業者誓約書", layer: 3, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: ["agriculture"], org: null, employment: ["dispatch"] },
+            { no: 49, form_no: "分野参考様式第11-3号", form_name: "農業分野において派遣形態で受入れを行う誓約書", layer: 3, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: ["agriculture"], org: null, employment: ["dispatch"] },
+            
+            // 漁業分野
+            { no: 50, form_no: "分野参考様式第12-1号", form_name: "漁業分野における誓約書（特定技能所属機関）", layer: 3, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: ["fishery"], org: null, employment: ["direct"] },
+            { no: 51, form_no: "分野参考様式第12-2号", form_name: "漁業分野における誓約書（登録支援機関）", layer: 3, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: ["fishery"], org: null, employment: ["dispatch"] },
+            
+            { no: 52, form_no: "分野参考様式第13-1号", form_name: "飲食料品製造業分野における誓約書（特定技能所属機関）", layer: 3, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: ["food-manufacturing"], org: null, employment: null },
+            { no: 53, form_no: "分野参考様式第14-1号", form_name: "外食業分野における誓約書（特定技能所属機関）", layer: 3, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: ["food-service"], org: null, employment: null },
+            { no: 54, form_no: "分野参考様式第15-1号", form_name: "自動車運送業分野における誓約書（特定技能所属機関）", layer: 3, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: ["auto-transport"], org: null, employment: null },
+            { no: 55, form_no: "分野参考様式第16-1号", form_name: "鉄道分野における誓約書（特定技能所属機関）", layer: 3, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: ["railway"], org: null, employment: null },
+            { no: 56, form_no: "分野参考様式第17-1号", form_name: "林業分野における誓約書（特定技能所属機関）", layer: 3, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: ["forestry"], org: null, employment: null },
+            { no: 57, form_no: "分野参考様式第18-1号", form_name: "木材産業分野における誓約書（特定技能所属機関）", layer: 3, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: ["wood"], org: null, employment: null },
+
+            // ===== 第3層：第3表（分野別チェックリスト）=====
+            // 特定技能1号・認定・変更用
+            { no: 58, form_no: "第3表の1（特定技能1号・認定・変更用）", form_name: "介護分野に関する必要な書類", layer: 3, 
+              visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["kaigo"], org: null, employment: null },
+            { no: 59, form_no: "第3表の2（特定技能1号・認定・変更用）", form_name: "ビルクリーニング分野に関する必要な書類", layer: 3, 
+              visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["building"], org: null, employment: null },
+            { no: 60, form_no: "第3表の3（特定技能1号・認定・変更用）", form_name: "工業製品製造業分野に関する必要な書類", layer: 3, 
+              visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["manufacturing"], org: null, employment: null },
+            { no: 61, form_no: "第3表の4（特定技能1号・認定・変更用）", form_name: "建設分野に関する必要な書類", layer: 3, 
+              visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["construction"], org: null, employment: null },
+            { no: 62, form_no: "第3表の5（特定技能1号・認定・変更用）", form_name: "造船・舶用工業分野に関する必要な書類", layer: 3, 
+              visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["shipbuilding"], org: null, employment: null },
+            { no: 63, form_no: "第3表の6（特定技能1号・認定・変更用）", form_name: "自動車整備分野に関する必要な書類", layer: 3, 
+              visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["auto-maintenance"], org: null, employment: null },
+            { no: 64, form_no: "第3表の7（特定技能1号・認定・変更用）", form_name: "航空分野に関する必要な書類", layer: 3, 
+              visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["aviation"], org: null, employment: null },
+            { no: 65, form_no: "第3表の8（特定技能1号・認定・変更用）", form_name: "宿泊分野に関する必要な書類", layer: 3, 
+              visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["accommodation"], org: null, employment: null },
+            { no: 66, form_no: "第3表の9（特定技能1号・認定・変更用）", form_name: "自動車運送業分野に関する必要な書類", layer: 3, 
+              visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["auto-transport"], org: null, employment: null },
+            { no: 67, form_no: "第3表の10（特定技能1号・認定・変更用）", form_name: "鉄道分野に関する必要な書類", layer: 3, 
+              visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["railway"], org: null, employment: null },
+            
+            // 農業 - 直接雇用/派遣雇用
+            { no: 68, form_no: "第3表の11の1（特定技能1号・認定・変更用）", form_name: "農業分野に関する必要な書類（直接雇用）", layer: 3, 
+              visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["agriculture"], org: null, employment: ["direct"] },
+            { no: 69, form_no: "第3表の11の2（特定技能1号・認定・変更用）", form_name: "農業分野に関する必要な書類（法人派遣雇用）", layer: 3, 
+              visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["agriculture"], org: ["hojin"], employment: ["dispatch"] },
+            { no: 70, form_no: "第3表の11の3（特定技能1号・認定・変更用）", form_name: "農業分野に関する必要な書類（個人事業主派遣雇用）", layer: 3, 
+              visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["agriculture"], org: ["kojin"], employment: ["dispatch"] },
+            
+            // 漁業 - 直接雇用/派遣雇用
+            { no: 71, form_no: "第3表の12の1（特定技能1号・認定・変更用）", form_name: "漁業分野に関する必要な書類（直接雇用）", layer: 3, 
+              visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["fishery"], org: null, employment: ["direct"] },
+            { no: 72, form_no: "第3表の12の2（特定技能1号・認定・変更用）", form_name: "漁業分野に関する必要な書類（法人派遣雇用）", layer: 3, 
+              visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["fishery"], org: ["hojin"], employment: ["dispatch"] },
+            { no: 73, form_no: "第3表の12の3（特定技能1号・認定・変更用）", form_name: "漁業分野に関する必要な書類（個人事業主派遣雇用）", layer: 3, 
+              visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["fishery"], org: ["kojin"], employment: ["dispatch"] },
+            
+            { no: 74, form_no: "第3表の13（特定技能1号・認定・変更用）", form_name: "飲食料品製造業分野に関する必要な書類", layer: 3, 
+              visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["food-manufacturing"], org: null, employment: null },
+            { no: 75, form_no: "第3表の14（特定技能1号・認定・変更用）", form_name: "外食業分野に関する必要な書類", layer: 3, 
+              visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["food-service"], org: null, employment: null },
+            { no: 76, form_no: "第3表の15（特定技能1号・認定・変更用）", form_name: "林業分野に関する必要な書類", layer: 3, 
+              visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["forestry"], org: null, employment: null },
+            { no: 77, form_no: "第3表の16（特定技能1号・認定・変更用）", form_name: "木材産業分野に関する必要な書類", layer: 3, 
+              visa: ["tokutei1"], appType: ["nintei", "henko"], sector: ["wood"], org: null, employment: null },
+
+            // 特定技能1号・更新用
+            { no: 78, form_no: "第3表の1（特定技能1号・更新用）", form_name: "分野に関する必要書類（農業・漁業除く）", layer: 3, 
+              visa: ["tokutei1"], appType: ["koshin"], sector: ["kaigo", "building", "manufacturing", "construction", "shipbuilding", "auto-maintenance", "aviation", "accommodation", "food-manufacturing", "food-service", "auto-transport", "railway", "forestry", "wood"], org: null, employment: null },
+            { no: 79, form_no: "第3表の2の1（特定技能1号・更新用）", form_name: "農業分野に関する必要な書類（直接雇用）", layer: 3, 
+              visa: ["tokutei1"], appType: ["koshin"], sector: ["agriculture"], org: null, employment: ["direct"] },
+            { no: 80, form_no: "第3表の2の2（特定技能1号・更新用）", form_name: "農業分野に関する必要な書類（法人派遣雇用）", layer: 3, 
+              visa: ["tokutei1"], appType: ["koshin"], sector: ["agriculture"], org: ["hojin"], employment: ["dispatch"] },
+            { no: 81, form_no: "第3表の2の3（特定技能1号・更新用）", form_name: "農業分野に関する必要な書類（個人事業主派遣雇用）", layer: 3, 
+              visa: ["tokutei1"], appType: ["koshin"], sector: ["agriculture"], org: ["kojin"], employment: ["dispatch"] },
+            { no: 82, form_no: "第3表の3の1（特定技能1号・更新用）", form_name: "漁業分野に関する必要な書類（直接雇用）", layer: 3, 
+              visa: ["tokutei1"], appType: ["koshin"], sector: ["fishery"], org: null, employment: ["direct"] },
+            { no: 83, form_no: "第3表の3の2（特定技能1号・更新用）", form_name: "漁業分野に関する必要な書類（法人派遣雇用）", layer: 3, 
+              visa: ["tokutei1"], appType: ["koshin"], sector: ["fishery"], org: ["hojin"], employment: ["dispatch"] },
+            { no: 84, form_no: "第3表の3の3（特定技能1号・更新用）", form_name: "漁業分野に関する必要な書類（個人事業主派遣雇用）", layer: 3, 
+              visa: ["tokutei1"], appType: ["koshin"], sector: ["fishery"], org: ["kojin"], employment: ["dispatch"] },
+
+            // 特定技能2号
+            { no: 85, form_no: "第3表の1（特定技能2号・認定・変更用）", form_name: "ビルクリーニング分野に関する必要な書類（特定技能２号）", layer: 3, 
+              visa: ["tokutei2"], appType: ["nintei", "henko"], sector: ["building"], org: null, employment: null },
+            { no: 86, form_no: "第3表の2（特定技能2号・認定・変更用）", form_name: "工業製品製造業分野に関する必要な書類（特定技能２号）", layer: 3, 
+              visa: ["tokutei2"], appType: ["nintei", "henko"], sector: ["manufacturing"], org: null, employment: null },
+            { no: 87, form_no: "第3表の8の1（特定技能2号・認定・変更用）", form_name: "農業分野に関する必要な書類（特定技能２号・直接雇用）", layer: 3, 
+              visa: ["tokutei2"], appType: ["nintei", "henko"], sector: ["agriculture"], org: null, employment: ["direct"] },
+            { no: 88, form_no: "第3表の8の2（特定技能2号・認定・変更用）", form_name: "農業分野に関する必要な書類（特定技能２号・法人派遣雇用）", layer: 3, 
+              visa: ["tokutei2"], appType: ["nintei", "henko"], sector: ["agriculture"], org: ["hojin"], employment: ["dispatch"] },
+            { no: 89, form_no: "第3表の9の1（特定技能2号・認定・変更用）", form_name: "漁業分野に関する必要な書類（特定技能２号・直接雇用）", layer: 3, 
+              visa: ["tokutei2"], appType: ["nintei", "henko"], sector: ["fishery"], org: null, employment: ["direct"] },
+
+            // ===== 第4層：派遣用書類 =====
+            { no: 90, form_no: "参考様式第1-12号", form_name: "派遣計画書", layer: 4, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: ["agriculture", "fishery"], org: null, employment: ["dispatch"] },
+            { no: 91, form_no: "参考様式第1-14号", form_name: "派遣先の概要書（農業分野）", layer: 4, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: ["agriculture"], org: null, employment: ["dispatch"] },
+            { no: 92, form_no: "参考様式第1-15号", form_name: "派遣先の概要書（漁業分野）", layer: 4, 
+              visa: ["tokutei1", "tokutei2"], appType: null, sector: ["fishery"], org: null, employment: ["dispatch"] },
+        ];
+
+        const layerNames = { 1: "共通", 2: "機関", 3: "分野", 4: "派遣" };
+        const updaters = ["田中 太郎", "鈴木 花子", "山田 一郎", "佐藤 優希", "高橋 健一"];
+        
+        function getRandomDate() {
+            const year = 2024;
+            const month = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0');
+            const day = String(Math.floor(Math.random() * 28) + 1).padStart(2, '0');
+            const hour = String(Math.floor(Math.random() * 12) + 8).padStart(2, '0');
+            const min = String(Math.floor(Math.random() * 60)).padStart(2, '0');
+            return `${year}年${month}月${day}日 ${hour}:${min}`;
+        }
+
+        // ========== MASTER SETTING DATA ==========
+        let currentMaster = {
+            id: null,
+            name: '',
+            filters: {},
+            checkedForms: {} // { formNo: true/false }
+        };
+
+        // Toggle state for showing extra forms
+        let showExtraForms = false;
+
+        // ========== FILTER LOGIC (ADD/UNION) ==========
+
+        // Check if form matches a specific layer's filter
+        function matchesLayerFilter(form, filters, layerType) {
+            // Always check visa first (Layer 0)
+            if (filters.visa && form.visa !== null) {
+                if (!Array.isArray(form.visa) || !form.visa.includes(filters.visa)) return false;
+            }
+
+            // Check search text
+            if (filters.searchText) {
+                const search = filters.searchText.toLowerCase();
+                const formNo = form.form_no ? form.form_no.toLowerCase() : '';
+                const formName = form.form_name ? form.form_name.toLowerCase() : '';
+                if (!formNo.includes(search) && !formName.includes(search)) {
+                    return false;
+                }
+            }
+
+            // Layer-specific filters
+            if (layerType === 'L1') {
+                // Layer 1: appType filter
+                if (filters.appType && form.appType !== null) {
+                    if (!Array.isArray(form.appType) || !form.appType.includes(filters.appType)) return false;
+                }
+            } else if (layerType === 'L2') {
+                // Layer 2: org + category filter
+                if (filters.org && filters.org !== 'undecided' && form.org !== null) {
+                    if (!Array.isArray(form.org) || !form.org.includes(filters.org)) return false;
+                }
+                if (filters.category && form.category !== null) {
+                    if (!Array.isArray(form.category) || !form.category.includes(filters.category)) return false;
+                }
+            } else if (layerType === 'L3') {
+                // Layer 3: sector filter
+                if (filters.sector && form.sector !== null) {
+                    if (!Array.isArray(form.sector) || !form.sector.includes(filters.sector)) return false;
+                }
+            } else if (layerType === 'L4') {
+                // Layer 4: employment filter (also needs sector for agri/fishery)
+                if (filters.sector && form.sector !== null) {
+                    if (!Array.isArray(form.sector) || !form.sector.includes(filters.sector)) return false;
+                }
+                if (filters.employment && form.employment !== null) {
+                    if (!Array.isArray(form.employment) || !form.employment.includes(filters.employment)) return false;
+                }
+            }
+
+            return true;
+        }
+
+        function getFilters() {
+            const visa = document.getElementById('visa-type').value;
+            const appType = document.getElementById('app-type').value;
+            const org = document.getElementById('org-type').value;
+            const category = document.getElementById('category').value;
+            const sector = document.getElementById('sector').value;
+            const employment = document.getElementById('employment-type').value;
+            const searchText = document.getElementById('searchInput').value;
+
+            return { visa, appType, org, category, sector, employment, searchText };
+        }
+
+        // NEW: ADD/UNION logic - collect forms from each selected layer
+        function applyFilters() {
+            const filters = getFilters();
+            const isTokutei = filters.visa === 'tokutei1' || filters.visa === 'tokutei2';
+            const isAgricultureOrFishery = filters.sector === 'agriculture' || filters.sector === 'fishery';
+            const hasVisa = !!filters.visa;
+            const hasAppType = !!filters.appType;
+            const hasOrg = !!filters.org;
+            const hasCategory = !!filters.category;
+            const hasSector = !!filters.sector;
+            const hasEmployment = !!filters.employment;
+
+            // No selection → show all forms with warning
+            if (!hasVisa) {
+                renderTable(formsData, true);
+                updateFilterSummary(filters);
+                return;
+            }
+
+            // Collect forms using ADD/UNION logic
+            const collectedForms = new Set();
+
+            formsData.forEach(form => {
+                // Check visa first (Layer 0 base filter)
+                if (form.visa !== null) {
+                    if (!Array.isArray(form.visa) || !form.visa.includes(filters.visa)) return;
+                }
+
+                // Check search text
+                if (filters.searchText) {
+                    const search = filters.searchText.toLowerCase();
+                    const formNo = form.form_no ? form.form_no.toLowerCase() : '';
+                    const formName = form.form_name ? form.form_name.toLowerCase() : '';
+                    if (!formNo.includes(search) && !formName.includes(search)) return;
+                }
+
+                // === EXTRA FORMS MODE: show all matching forms for selected layers ===
+                if (showExtraForms) {
+                    // Layer 1: show all Layer 1 forms matching visa
+                    if (form.layer === 1 && hasAppType) {
+                        collectedForms.add(form.no);
+                    }
+                    // Layer 2: show all Layer 2 forms matching visa
+                    if (form.layer === 2 && (hasOrg || hasCategory)) {
+                        collectedForms.add(form.no);
+                    }
+                    // Layer 3: show all Layer 3 forms (if tokutei)
+                    if (form.layer === 3 && isTokutei && hasSector) {
+                        collectedForms.add(form.no);
+                    }
+                    // Layer 4: show all Layer 4 forms (if agri/fishery)
+                    if (form.layer === 4 && isTokutei && isAgricultureOrFishery && hasEmployment) {
+                        collectedForms.add(form.no);
+                    }
+                    return;
+                }
+
+                // === NORMAL MODE: strict filter matching ===
+                // Layer 1 forms: add if L1 (appType) is selected
+                if (form.layer === 1 && hasAppType) {
+                    if (matchesLayerFilter(form, filters, 'L1')) {
+                        collectedForms.add(form.no);
+                    }
+                }
+
+                // Layer 2 forms: add if L2 (org/category) is selected
+                if (form.layer === 2 && (hasOrg || hasCategory)) {
+                    if (matchesLayerFilter(form, filters, 'L2')) {
+                        collectedForms.add(form.no);
+                    }
+                }
+
+                // Layer 3 forms: add if L3 (sector) is selected AND is tokutei
+                if (form.layer === 3 && hasSector && isTokutei) {
+                    if (matchesLayerFilter(form, filters, 'L3')) {
+                        collectedForms.add(form.no);
+                    }
+                }
+
+                // Layer 4 forms: add if L4 (employment) is selected AND is agri/fishery
+                if (form.layer === 4 && hasEmployment && isAgricultureOrFishery && isTokutei) {
+                    if (matchesLayerFilter(form, filters, 'L4')) {
+                        collectedForms.add(form.no);
+                    }
+                }
+            });
+
+            // Get forms that match the collected IDs
+            const filteredForms = formsData.filter(form => collectedForms.has(form.no));
+
+            renderTable(filteredForms, false);
+            updateFilterSummary(filters);
+        }
+
+        // Save current master setting
+        function saveMaster() {
+            const filters = getFilters();
+            const checkedForms = {};
+
+            document.querySelectorAll('.table-body input[type="checkbox"]').forEach(cb => {
+                const formNo = parseInt(cb.dataset.formNo);
+                if (formNo) {
+                    checkedForms[formNo] = cb.checked;
+                }
+            });
+
+            currentMaster = {
+                id: currentMaster.id || 'master_' + Date.now(),
+                name: `${getVisaLabel(filters.visa)} - ${getAppTypeLabel(filters.appType)}`,
+                filters: filters,
+                checkedForms: checkedForms
+            };
+
+            // Save to localStorage
+            localStorage.setItem('currentMaster', JSON.stringify(currentMaster));
+
+            const checkedCount = Object.values(checkedForms).filter(v => v).length;
+            alert(`マスタ設定を保存しました。\n選択件数: ${checkedCount}件`);
+        }
+
+        // Load master setting
+        function loadMaster() {
+            const saved = localStorage.getItem('currentMaster');
+            if (saved) {
+                currentMaster = JSON.parse(saved);
+
+                // Restore filters
+                if (currentMaster.filters) {
+                    document.getElementById('visa-type').value = currentMaster.filters.visa || '';
+                    document.getElementById('app-type').value = currentMaster.filters.appType || '';
+                    document.getElementById('org-type').value = currentMaster.filters.org || '';
+                    document.getElementById('category').value = currentMaster.filters.category || '';
+                    document.getElementById('sector').value = currentMaster.filters.sector || '';
+                    document.getElementById('employment-type').value = currentMaster.filters.employment || '';
+                }
+
+                updateAllLayers();
+                applyFilters();
+
+                // Restore checked state after render
+                setTimeout(() => {
+                    restoreCheckedState();
+                }, 100);
+            }
+        }
+
+        // Restore checkbox states from master
+        function restoreCheckedState() {
+            if (!currentMaster.checkedForms) return;
+
+            document.querySelectorAll('.table-body input[type="checkbox"]').forEach(cb => {
+                const formNo = parseInt(cb.dataset.formNo);
+                if (formNo && currentMaster.checkedForms[formNo] !== undefined) {
+                    cb.checked = currentMaster.checkedForms[formNo];
+                }
+            });
+
+            updateCount();
+            applyViewFilter();
+        }
+
+        // Toggle extra forms display
+        function toggleExtraForms() {
+            showExtraForms = document.getElementById('showExtraForms').checked;
+            applyFilters();
+        }
+
+        // Helper functions for labels
+        function getVisaLabel(value) {
+            const labels = { tokutei1: '特定技能1号', tokutei2: '特定技能2号', tokkatsu: '特定活動', gijinkoku: '技人国' };
+            return labels[value] || value || '未選択';
+        }
+
+        function getAppTypeLabel(value) {
+            const labels = { nintei: '認定', henko: '変更', koshin: '更新' };
+            return labels[value] || value || '未選択';
+        }
+
+        function renderTable(data, showWarning) {
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = '';
+
+            // Show warning when no filters selected
+            if (showWarning) {
+                const warning = document.createElement('div');
+                warning.className = 'filter-warning';
+                warning.textContent = '在留資格を選択してください。レイヤーを選択すると、該当する書類が追加表示されます。';
+                tableBody.appendChild(warning);
+            }
+
+            // If no layer selected but visa selected, show hint
+            const filters = getFilters();
+            if (filters.visa && data.length === 0) {
+                const hint = document.createElement('div');
+                hint.className = 'filter-warning';
+                hint.style.borderLeftColor = '#4A9BAD';
+                hint.innerHTML = '申請種別・機関情報・分野のいずれかを選択してください。<br>選択したレイヤーの書類が追加表示されます。';
+                tableBody.appendChild(hint);
+                document.getElementById('totalCount').textContent = '0';
+                document.getElementById('checkedCount').textContent = '選択：0件 / 未選択：0件';
+                return;
+            }
+
+            if (data.length === 0 && !showWarning) {
+                tableBody.innerHTML = '<div class="no-data">該当する書類がありません</div>';
+                document.getElementById('totalCount').textContent = '0';
+                document.getElementById('checkedCount').textContent = '選択：0件 / 未選択：0件';
+                return;
+            }
+
+            // Group by layer
+            const grouped = {};
+            data.forEach(form => {
+                if (!grouped[form.layer]) grouped[form.layer] = [];
+                grouped[form.layer].push(form);
+            });
+
+            let displayNo = 0;
+            [1, 2, 3, 4].forEach(layer => {
+                if (grouped[layer] && grouped[layer].length > 0) {
+                    const header = document.createElement('div');
+                    header.className = `layer-group-header l${layer}`;
+                    header.innerHTML = `
+                        <span class="layer-badge l${layer}">${layerNames[layer]}</span>
+                        <span>${getLayerDescription(layer)}</span>
+                        <span class="layer-group-count">${grouped[layer].length}件</span>
+                    `;
+                    tableBody.appendChild(header);
+
+                    grouped[layer].forEach(form => {
+                        displayNo++;
+                        // Check if this form was previously checked in master
+                        const wasChecked = currentMaster.checkedForms && currentMaster.checkedForms[form.no];
+                        const isChecked = wasChecked !== undefined ? wasChecked : true;
+
+                        const row = document.createElement('div');
+                        row.className = 'table-row';
+                        row.dataset.formNo = form.no;
+                        row.innerHTML = `
+                            <div>${displayNo}</div>
+                            <div>
+                                <div class="checkbox-wrapper">
+                                    <input type="checkbox" ${isChecked ? 'checked' : ''} data-form-no="${form.no}" onchange="onCheckboxChange(this)">
+                                </div>
+                            </div>
+                            <div class="form-name">
+                                <div class="form-name-main">
+                                    <span class="layer-badge l${form.layer}">${layerNames[form.layer]}</span>
+                                    <span>${form.form_no}</span>
+                                </div>
+                                ${form.form_name ? `<div class="form-name-sub">${form.form_name}</div>` : ''}
+                            </div>
+                            <div>${updaters[Math.floor(Math.random() * updaters.length)]}</div>
+                            <div>${getRandomDate()}</div>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                }
+            });
+
+            document.getElementById('totalCount').textContent = data.length;
+            updateCount();
+            applyViewFilter();
+        }
+
+        // Handle checkbox change
+        function onCheckboxChange(checkbox) {
+            updateCount();
+            applyViewFilter();
+        }
+
+        function getLayerDescription(layer) {
+            const descriptions = {
+                1: "共通書類",
+                2: "機関書類",
+                3: "分野別書類",
+                4: "派遣用書類"
+            };
+            return descriptions[layer];
+        }
+
+        function updateCount() {
+            const allCheckboxes = document.querySelectorAll('.table-body input[type="checkbox"]');
+            const checkedCheckboxes = document.querySelectorAll('.table-body input[type="checkbox"]:checked');
+            const total = allCheckboxes.length;
+            const checked = checkedCheckboxes.length;
+            const unchecked = total - checked;
+
+            document.getElementById('checkedCount').textContent = `選択：${checked}件 / 未選択：${unchecked}件`;
+
+            // Update toggle button labels with counts
+            document.getElementById('viewAll').textContent = `全て (${total})`;
+            document.getElementById('viewChecked').textContent = `選択のみ (${checked})`;
+            document.getElementById('viewUnchecked').textContent = `未選択 (${unchecked})`;
+        }
+
+        function updateFilterSummary(filters) {
+            const summary = document.getElementById('filterSummary');
+            const tags = [];
+            
+            const labels = {
+                visa: { tokutei1: '特定技能1号', tokutei2: '特定技能2号', tokkatsu: '特定活動', gijinkoku: '技術・人文知識・国際業務' },
+                appType: { nintei: '認定', henko: '変更', koshin: '更新' },
+                org: { hojin: '法人', kojin: '個人事業主', undecided: '未定' },
+                category: { '1': 'カテゴリー1', '2': 'カテゴリー2', '3': 'カテゴリー3', '4': 'カテゴリー4' },
+                sector: { kaigo: '介護', building: 'ビルクリーニング', manufacturing: '工業製品製造業', construction: '建設', 
+                         shipbuilding: '造船・舶用工業', 'auto-maintenance': '自動車整備', aviation: '航空', accommodation: '宿泊',
+                         agriculture: '農業', fishery: '漁業', 'food-manufacturing': '飲食料品製造業', 'food-service': '外食業',
+                         'auto-transport': '自動車運送業', railway: '鉄道', forestry: '林業', wood: '木材産業' },
+                employment: { direct: '直接雇用', dispatch: '派遣雇用' }
+            };
+            
+            if (filters.visa && labels.visa[filters.visa]) tags.push(labels.visa[filters.visa]);
+            if (filters.appType && labels.appType[filters.appType]) tags.push(labels.appType[filters.appType]);
+            if (filters.org && labels.org[filters.org]) tags.push(labels.org[filters.org]);
+            if (filters.category && labels.category[filters.category]) tags.push(labels.category[filters.category]);
+            if (filters.sector && labels.sector[filters.sector]) tags.push(labels.sector[filters.sector]);
+            if (filters.employment && labels.employment[filters.employment]) tags.push(labels.employment[filters.employment]);
+            
+            summary.innerHTML = tags.map(t => `<span class="filter-tag">${t}</span>`).join('');
+        }
+
+        // ========== CASCADING LAYER LOGIC ==========
+
+        function updateAllLayers() {
+            const visa = document.getElementById('visa-type').value;
+            const sector = document.getElementById('sector').value;
+            const layer1 = document.getElementById('layer1');
+            const layer2 = document.getElementById('layer2');
+            const layer3 = document.getElementById('layer3');
+            const layer4 = document.getElementById('layer4');
+            const layer3Status = document.getElementById('layer3Status');
+            const layer4Status = document.getElementById('layer4Status');
+            const isTokutei = visa === 'tokutei1' || visa === 'tokutei2';
+            const isAgriOrFish = sector === 'agriculture' || sector === 'fishery';
+
+            // Layer 1, 2, 3 are siblings - all depend on Layer 0 (visa)
+            // Layer 1: enabled if visa selected
+            visa ? layer1.classList.remove('disabled-layer') : layer1.classList.add('disabled-layer');
+
+            // Layer 2: enabled if visa selected (sibling of L1, not child of L1)
+            visa ? layer2.classList.remove('disabled-layer') : layer2.classList.add('disabled-layer');
+
+            // Layer 3: only for Tokutei Ginou
+            if (isTokutei) {
+                layer3.classList.remove('disabled-layer');
+                layer3Status.textContent = '必須';
+                layer3Status.className = 'layer-status required';
+            } else {
+                layer3.classList.add('disabled-layer');
+                layer3Status.textContent = '特定技能のみ';
+                layer3Status.className = 'layer-status locked';
+            }
+
+            // Layer 4: child of Layer 3 - only for Agriculture/Fishery
+            if (isTokutei && isAgriOrFish) {
+                layer4.classList.remove('disabled-layer');
+                layer4Status.textContent = '必須';
+                layer4Status.className = 'layer-status required';
+            } else {
+                layer4.classList.add('disabled-layer');
+                layer4Status.textContent = '農業・漁業のみ';
+                layer4Status.className = 'layer-status locked';
+            }
+
+            updateCategoryOptions();
+        }
+
+        // Reset a select element to default (first option)
+        function resetSelect(id) {
+            document.getElementById(id).value = '';
+        }
+
+        // L0 changes → reset all children (L1, L2, L3, L4)
+        function onVisaChange() {
+            resetSelect('app-type');
+            resetSelect('org-type');
+            resetSelect('category');
+            resetSelect('sector');
+            resetSelect('employment-type');
+            updateAllLayers();
+            applyFilters();
+        }
+
+        // L1 changes → no children to reset
+        function onAppTypeChange() { updateAllLayers(); applyFilters(); }
+
+        // L2 changes → no children to reset
+        function onOrgChange() { updateAllLayers(); applyFilters(); }
+        function onCategoryChange() { updateAllLayers(); applyFilters(); }
+
+        // L3 changes → reset child L4
+        function onSectorChange() {
+            resetSelect('employment-type');
+            updateAllLayers();
+            applyFilters();
+        }
+
+        // L4 changes → no children
+        function onEmploymentChange() { updateAllLayers(); applyFilters(); }
+
+        function updateCategoryOptions() {
+            const org = document.getElementById('org-type').value;
+            const category = document.getElementById('category');
+            const cat1Option = category.querySelector('option[value="1"]');
+
+            if (org === 'kojin') {
+                cat1Option.disabled = true;
+                cat1Option.textContent = 'カテゴリー1（個人事業主不可）';
+                if (category.value === '1') category.value = '2';
+            } else {
+                cat1Option.disabled = false;
+                cat1Option.textContent = 'カテゴリー1';
+            }
+        }
+
+        // Toggle filter section collapse/expand
+        function toggleFilter() {
+            const sectionTitle = document.querySelector('.section-title');
+            const filterContent = document.getElementById('filterContent');
+            const collapseHint = document.getElementById('collapseHint');
+
+            sectionTitle.classList.toggle('collapsed');
+            filterContent.classList.toggle('collapsed');
+
+            if (filterContent.classList.contains('collapsed')) {
+                collapseHint.textContent = 'クリックで展開';
+            } else {
+                collapseHint.textContent = 'クリックで折りたたむ';
+            }
+        }
+
+        // Current view mode - default to 'checked' (show only checked forms)
+        let currentView = 'checked';
+
+        // Toggle view between all, checked only, and unchecked only
+        function toggleView(mode) {
+            currentView = mode;
+
+            // Update button states
+            document.getElementById('viewAll').classList.remove('active');
+            document.getElementById('viewChecked').classList.remove('active');
+            document.getElementById('viewUnchecked').classList.remove('active');
+
+            if (mode === 'all') {
+                document.getElementById('viewAll').classList.add('active');
+            } else if (mode === 'checked') {
+                document.getElementById('viewChecked').classList.add('active');
+            } else {
+                document.getElementById('viewUnchecked').classList.add('active');
+            }
+
+            applyViewFilter();
+        }
+
+        // Apply view filter to show/hide rows
+        function applyViewFilter() {
+            const rows = document.querySelectorAll('.table-row');
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                const checkbox = row.querySelector('input[type="checkbox"]');
+                if (!checkbox) return;
+
+                const isChecked = checkbox.checked;
+
+                if (currentView === 'all') {
+                    row.classList.remove('hidden');
+                    visibleCount++;
+                } else if (currentView === 'checked') {
+                    if (isChecked) {
+                        row.classList.remove('hidden');
+                        visibleCount++;
+                    } else {
+                        row.classList.add('hidden');
+                    }
+                } else { // unchecked
+                    if (!isChecked) {
+                        row.classList.remove('hidden');
+                        visibleCount++;
+                    } else {
+                        row.classList.add('hidden');
+                    }
+                }
+
+                // Update row style based on checked state
+                if (isChecked) {
+                    row.classList.remove('unchecked');
+                } else {
+                    row.classList.add('unchecked');
+                }
+            });
+        }
+
+        // Select all checkboxes
+        function selectAll() {
+            const checkboxes = document.querySelectorAll('.table-body input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = true);
+            updateCount();
+            applyViewFilter();
+        }
+
+        // Deselect all checkboxes
+        function deselectAll() {
+            const checkboxes = document.querySelectorAll('.table-body input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = false);
+            updateCount();
+            applyViewFilter();
+        }
+
+        // Initialize
+        updateAllLayers();
+        applyFilters();
+    </script>
+</body>
+</html>

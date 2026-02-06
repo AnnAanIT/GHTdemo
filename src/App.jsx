@@ -1,8 +1,8 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import FilterSection from './components/FilterSection';
 import DataTable from './components/DataTable';
 import { formsData } from './data/formsData';
-import { filterForms } from './utils/filterUtils';
+import { filterForms, getAutoCheckedForms, mergeCheckedState } from './utils/filterUtils';
 import './styles/App.css';
 
 function App() {
@@ -17,17 +17,41 @@ function App() {
     searchText: '',
   });
 
-  // Checked items state
-  const [checkedItems, setCheckedItems] = useState({});
+  // Manual overrides - tracks user's manual changes (true = added, false = removed)
+  const [manualOverrides, setManualOverrides] = useState({});
+
+  // Show additional forms toggle (forms not matching filter but can be added)
+  const [showAdditional, setShowAdditional] = useState(false);
 
   // Filter forms
   const { filteredForms, showWarning } = useMemo(() => {
     return filterForms(formsData, filters);
   }, [filters]);
 
+  // Auto-checked forms based on filter
+  const autoCheckedForms = useMemo(() => {
+    return getAutoCheckedForms(formsData, filters);
+  }, [filters]);
+
+  // Final checked state = auto + manual overrides
+  const checkedItems = useMemo(() => {
+    return mergeCheckedState(autoCheckedForms, manualOverrides);
+  }, [autoCheckedForms, manualOverrides]);
+
+  // Forms to display - filtered forms + optionally additional forms
+  const displayForms = useMemo(() => {
+    if (!showAdditional) {
+      return filteredForms;
+    }
+    // Show all forms when "追加表示" is enabled
+    return formsData;
+  }, [filteredForms, showAdditional]);
+
   // Handle filter change
   const handleFilterChange = useCallback((newFilters) => {
     setFilters(newFilters);
+    // Reset manual overrides when filter changes (optional - can be removed if you want to keep overrides)
+    // setManualOverrides({});
   }, []);
 
   // Handle search
@@ -36,9 +60,28 @@ function App() {
     console.log('Search triggered', filters);
   }, [filters]);
 
-  // Handle check change
-  const handleCheckChange = useCallback((newCheckedItems) => {
-    setCheckedItems(newCheckedItems);
+  // Handle check change - now tracks manual overrides
+  const handleCheckChange = useCallback((formNo, isChecked) => {
+    const wasAutoChecked = autoCheckedForms[formNo] || false;
+
+    setManualOverrides(prev => {
+      const newOverrides = { ...prev };
+
+      if (isChecked === wasAutoChecked) {
+        // Back to auto state - remove override
+        delete newOverrides[formNo];
+      } else {
+        // Manual override
+        newOverrides[formNo] = isChecked;
+      }
+
+      return newOverrides;
+    });
+  }, [autoCheckedForms]);
+
+  // Handle toggle additional forms display
+  const handleToggleAdditional = useCallback(() => {
+    setShowAdditional(prev => !prev);
   }, []);
 
   // Handle save
@@ -48,8 +91,9 @@ function App() {
       .map(([no]) => parseInt(no));
 
     console.log('Saved forms:', selectedForms);
+    console.log('Manual overrides:', manualOverrides);
     alert(`保存しました。選択件数: ${selectedForms.length}件`);
-  }, [checkedItems]);
+  }, [checkedItems, manualOverrides]);
 
   return (
     <div className="container">
@@ -77,10 +121,13 @@ function App() {
 
       {/* Data Table */}
       <DataTable
-        forms={filteredForms}
+        forms={displayForms}
         showWarning={showWarning}
         checkedItems={checkedItems}
+        autoCheckedForms={autoCheckedForms}
         onCheckChange={handleCheckChange}
+        showAdditional={showAdditional}
+        onToggleAdditional={handleToggleAdditional}
       />
     </div>
   );

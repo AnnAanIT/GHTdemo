@@ -176,3 +176,44 @@ export function isLayerEnabled(layer, filters) {
       return true;
   }
 }
+
+/**
+ * Get auto-checked forms based on filter criteria
+ * Forms that match the filter should be automatically marked as 必須
+ * @param {Array} formsData - All forms data
+ * @param {Object} filters - Filter criteria
+ * @returns {Object} - { formNo: true } for forms that should be auto-checked
+ */
+export function getAutoCheckedForms(formsData, filters) {
+  const { filteredForms } = filterForms(formsData, filters);
+  const autoChecked = {};
+
+  filteredForms.forEach(form => {
+    autoChecked[form.no] = true;
+  });
+
+  return autoChecked;
+}
+
+/**
+ * Merge auto-checked forms with manual adjustments
+ * @param {Object} autoChecked - Auto-checked forms from filter
+ * @param {Object} manualOverrides - User's manual changes { formNo: true/false }
+ * @returns {Object} - Final checked state
+ */
+export function mergeCheckedState(autoChecked, manualOverrides) {
+  const result = { ...autoChecked };
+
+  // Apply manual overrides
+  Object.entries(manualOverrides).forEach(([formNo, isChecked]) => {
+    if (isChecked === false) {
+      // User unchecked - remove from result
+      delete result[formNo];
+    } else if (isChecked === true) {
+      // User added manually
+      result[formNo] = true;
+    }
+  });
+
+  return result;
+}
