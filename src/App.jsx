@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import FilterSection from './components/FilterSection';
 import DataTable from './components/DataTable';
 import { formsData } from './data/formsData';
@@ -7,10 +7,26 @@ import './styles/App.css';
 
 const STORAGE_KEY = 'shinsei-shorui-data';
 
+function getFilterKey(filters) {
+  const { visa, appType, org, category, sector, employment } = filters;
+  return [visa, appType, org, category, sector, employment].join('|');
+}
+
 function loadSavedData() {
   try {
     const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    return data || null;
+    if (!data) return null;
+    // New format
+    if (data.allOverrides) return data;
+    // Old format - migrate
+    if (data.filters) {
+      const migrated = { lastFilters: data.filters, allOverrides: {} };
+      if (data.manualOverrides && Object.keys(data.manualOverrides).length > 0) {
+        migrated.allOverrides[getFilterKey(data.filters)] = data.manualOverrides;
+      }
+      return migrated;
+    }
+    return null;
   } catch {
     return null;
   }
@@ -19,22 +35,33 @@ function loadSavedData() {
 function App() {
   const saved = loadSavedData();
 
-  // Filter state
-  const [filters, setFilters] = useState(saved?.filters || {
-    visa: '',
-    appType: '',
-    org: '',
-    category: '',
-    sector: '',
-    employment: '',
-    searchText: '',
+  // Saved data from localStorage (source of truth)
+  const [savedData, setSavedData] = useState({
+    lastFilters: saved?.lastFilters || {
+      visa: '', appType: '', org: '', category: '', sector: '', employment: '', searchText: '',
+    },
+    allOverrides: saved?.allOverrides || {},
   });
 
-  // Manual overrides - tracks user's manual changes (true = added, false = removed)
-  const [manualOverrides, setManualOverrides] = useState(saved?.manualOverrides || {});
+  // Current filter state
+  const [filters, setFilters] = useState(savedData.lastFilters);
 
-  // Show additional forms toggle (forms not matching filter but can be added)
+  // Current filter key (excludes searchText)
+  const currentFilterKey = useMemo(() => getFilterKey(filters), [filters]);
+
+  // Working overrides for current filter (starts from saved, modified by user)
+  const [workingOverrides, setWorkingOverrides] = useState(
+    () => savedData.allOverrides[getFilterKey(savedData.lastFilters)] || {}
+  );
+
+  // Show additional forms toggle
   const [showAdditional, setShowAdditional] = useState(false);
+
+  // Whether there are unsaved changes
+  const hasUnsavedChanges = useMemo(() => {
+    const saved = savedData.allOverrides[currentFilterKey] || {};
+    return JSON.stringify(workingOverrides) !== JSON.stringify(saved);
+  }, [workingOverrides, savedData, currentFilterKey]);
 
   // Filter forms
   const { filteredForms, showWarning } = useMemo(() => {
@@ -46,65 +73,52 @@ function App() {
     return getAutoCheckedForms(formsData, filters);
   }, [filters]);
 
-  // Final checked state = auto + manual overrides
+  // Final checked state = auto + working overrides
   const checkedItems = useMemo(() => {
-    return mergeCheckedState(autoCheckedForms, manualOverrides);
-  }, [autoCheckedForms, manualOverrides]);
+    return mergeCheckedState(autoCheckedForms, workingOverrides);
+  }, [autoCheckedForms, workingOverrides]);
 
   // Forms to display - filtered forms + optionally forms from enabled layers
   const displayForms = useMemo(() => {
     if (!showAdditional) {
       return filteredForms;
     }
-    // Show all forms from enabled layers when "追加表示" is enabled
     return getFormsFromEnabledLayers(formsData, filters);
   }, [filteredForms, showAdditional, filters]);
 
-  // Clean up stale manual overrides when filters change
-  useEffect(() => {
-    setManualOverrides(prev => {
-      if (Object.keys(prev).length === 0) return prev;
-
-      const validForms = getFormsFromEnabledLayers(formsData, filters);
-      const validFormNos = new Set(validForms.map(f => f.no));
-
-      const cleaned = {};
-      let changed = false;
-      Object.entries(prev).forEach(([formNo, value]) => {
-        if (validFormNos.has(parseInt(formNo))) {
-          cleaned[formNo] = value;
-        } else {
-          changed = true;
-        }
-      });
-
-      return changed ? cleaned : prev;
-    });
-  }, [filters]);
-
-  // Handle filter change
+  // Handle filter change - warn if unsaved changes
   const handleFilterChange = useCallback((newFilters) => {
+    const newKey = getFilterKey(newFilters);
+
+    // Only warn if filter key actually changes (not just searchText)
+    if (newKey !== currentFilterKey) {
+      if (hasUnsavedChanges) {
+        if (!window.confirm('未保存の変更があります。変更を破棄して切り替えますか？')) {
+          return;
+        }
+      }
+      // Load saved overrides for new filter combination
+      setWorkingOverrides(savedData.allOverrides[newKey] || {});
+    }
+
     setFilters(newFilters);
-  }, []);
+  }, [currentFilterKey, hasUnsavedChanges, savedData]);
 
   // Handle search
   const handleSearch = useCallback(() => {
-    // Filters are already applied via useMemo
     console.log('Search triggered', filters);
   }, [filters]);
 
-  // Handle check change - now tracks manual overrides
+  // Handle check change - modifies working overrides (unsaved)
   const handleCheckChange = useCallback((formNo, isChecked) => {
     const wasAutoChecked = autoCheckedForms[formNo] || false;
 
-    setManualOverrides(prev => {
+    setWorkingOverrides(prev => {
       const newOverrides = { ...prev };
 
       if (isChecked === wasAutoChecked) {
-        // Back to auto state - remove override
         delete newOverrides[formNo];
       } else {
-        // Manual override
         newOverrides[formNo] = isChecked;
       }
 
@@ -117,19 +131,28 @@ function App() {
     setShowAdditional(prev => !prev);
   }, []);
 
-  // Handle save
+  // Handle save - commit working overrides to saved data + localStorage
   const handleSave = useCallback(() => {
-    const selectedForms = Object.entries(checkedItems)
-      .filter(([_, checked]) => checked)
-      .map(([no]) => parseInt(no));
+    const newAllOverrides = { ...savedData.allOverrides };
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      filters: { ...filters, searchText: '' },
-      manualOverrides,
-    }));
+    if (Object.keys(workingOverrides).length > 0) {
+      newAllOverrides[currentFilterKey] = { ...workingOverrides };
+    } else {
+      delete newAllOverrides[currentFilterKey];
+    }
 
-    alert(`保存しました。選択件数: ${selectedForms.length}件`);
-  }, [checkedItems, manualOverrides, filters]);
+    const newSavedData = {
+      lastFilters: { ...filters, searchText: '' },
+      allOverrides: newAllOverrides,
+    };
+
+    setSavedData(newSavedData);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(newSavedData));
+
+    const selectedCount = Object.entries(checkedItems)
+      .filter(([_, checked]) => checked).length;
+    alert(`保存しました。選択件数: ${selectedCount}件`);
+  }, [savedData, workingOverrides, currentFilterKey, filters, checkedItems]);
 
   return (
     <div className="container">

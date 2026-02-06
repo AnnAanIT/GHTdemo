@@ -720,17 +720,20 @@ body {
 /* Manual Badge - shows +/- for manually added/removed */
 .manual-badge {
   position: absolute;
-  top: -4px;
-  right: -4px;
-  width: 14px;
-  height: 14px;
+  top: -6px;
+  right: -8px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
+  z-index: 10;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  pointer-events: none;
 }
 
 .manual-badge.add {
@@ -746,6 +749,11 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: visible;
+}
+
+.col-required {
+  overflow: visible !important;
 }
 
 /* Manually Added Row */
