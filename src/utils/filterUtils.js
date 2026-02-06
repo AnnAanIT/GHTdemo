@@ -220,23 +220,28 @@ export function mergeCheckedState(autoChecked, manualOverrides) {
 
 /**
  * Get all forms from enabled layers (for 追加表示)
+ * Shows forms from broader enabled layers, but filtered by current selections.
+ * E.g., selecting kaigo will only show kaigo-related forms, not all Layer 3 forms.
  * @param {Array} formsData - All forms data
  * @param {Object} filters - Filter criteria
- * @returns {Array} - Forms from enabled layers
+ * @returns {Array} - Forms from enabled layers matching current filter settings
  */
 export function getFormsFromEnabledLayers(formsData, filters) {
   const enabledLayers = [];
 
-  // Check which layers are enabled based on filter state
+  // Layer 1: enabled when visa selected
   if (isLayerEnabled(1, filters)) enabledLayers.push(1);
-  if (isLayerEnabled(2, filters) && (filters.org || filters.category)) enabledLayers.push(2);
-  if (isLayerEnabled(3, filters) && filters.sector) enabledLayers.push(3);
-  if (isLayerEnabled(4, filters) && filters.employment) enabledLayers.push(4);
+  // Layer 2: enabled when visa selected (don't require org/category to be set)
+  if (isLayerEnabled(2, filters)) enabledLayers.push(2);
+  // Layer 3: enabled when tokutei (don't require sector to be set)
+  if (isLayerEnabled(3, filters)) enabledLayers.push(3);
+  // Layer 4: enabled when tokutei + agri/fishery (don't require employment to be set)
+  if (isLayerEnabled(4, filters)) enabledLayers.push(4);
 
-  // If no specific layers enabled beyond L1, just return L1
   if (enabledLayers.length === 0 && filters.visa) {
     enabledLayers.push(1);
   }
 
-  return formsData.filter(form => enabledLayers.includes(form.layer));
+  // Filter by enabled layers AND apply matchesFilter to respect current selections
+  return formsData.filter(form => enabledLayers.includes(form.layer) && matchesFilter(form, filters));
 }
