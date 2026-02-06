@@ -11,7 +11,7 @@ const DataTable = ({
   showAdditional,
   onToggleAdditional
 }) => {
-  const [viewMode, setViewMode] = useState('all'); // 'all', 'checked', 'unchecked'
+  const [viewMode, setViewMode] = useState('checked'); // 'checked', 'unchecked'
 
   // Group forms by layer
   const groupedForms = useMemo(() => groupByLayer(forms), [forms]);
@@ -39,28 +39,6 @@ const DataTable = ({
     });
     return { checked, unchecked, total: forms.length };
   }, [forms, checkedItems]);
-
-  // Select all visible forms - now calls onCheckChange per form
-  const handleSelectAll = () => {
-    forms.forEach((form) => {
-      if (viewMode === 'all' || (viewMode === 'unchecked' && !checkedItems[form.no])) {
-        if (!checkedItems[form.no]) {
-          onCheckChange(form.no, true);
-        }
-      }
-    });
-  };
-
-  // Deselect all visible forms
-  const handleDeselectAll = () => {
-    forms.forEach((form) => {
-      if (viewMode === 'all' || (viewMode === 'checked' && checkedItems[form.no])) {
-        if (checkedItems[form.no]) {
-          onCheckChange(form.no, false);
-        }
-      }
-    });
-  };
 
   // Toggle single checkbox - now passes formNo and new state
   const handleToggle = (formNo) => {
@@ -95,12 +73,6 @@ const DataTable = ({
           <span className="table-toolbar-title">書類一覧</span>
           <div className="view-toggle">
             <button
-              className={`view-toggle-btn ${viewMode === 'all' ? 'active' : ''}`}
-              onClick={() => setViewMode('all')}
-            >
-              全て ({counts.total})
-            </button>
-            <button
               className={`view-toggle-btn ${viewMode === 'checked' ? 'active' : ''}`}
               onClick={() => setViewMode('checked')}
             >
@@ -123,12 +95,6 @@ const DataTable = ({
             />
             追加表示
           </label>
-          <button className="btn-select-action check-all" onClick={handleSelectAll}>
-            全選択
-          </button>
-          <button className="btn-select-action uncheck-all" onClick={handleDeselectAll}>
-            全解除
-          </button>
         </div>
       </div>
 

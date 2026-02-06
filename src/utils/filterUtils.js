@@ -217,3 +217,26 @@ export function mergeCheckedState(autoChecked, manualOverrides) {
 
   return result;
 }
+
+/**
+ * Get all forms from enabled layers (for 追加表示)
+ * @param {Array} formsData - All forms data
+ * @param {Object} filters - Filter criteria
+ * @returns {Array} - Forms from enabled layers
+ */
+export function getFormsFromEnabledLayers(formsData, filters) {
+  const enabledLayers = [];
+
+  // Check which layers are enabled based on filter state
+  if (isLayerEnabled(1, filters)) enabledLayers.push(1);
+  if (isLayerEnabled(2, filters) && (filters.org || filters.category)) enabledLayers.push(2);
+  if (isLayerEnabled(3, filters) && filters.sector) enabledLayers.push(3);
+  if (isLayerEnabled(4, filters) && filters.employment) enabledLayers.push(4);
+
+  // If no specific layers enabled beyond L1, just return L1
+  if (enabledLayers.length === 0 && filters.visa) {
+    enabledLayers.push(1);
+  }
+
+  return formsData.filter(form => enabledLayers.includes(form.layer));
+}

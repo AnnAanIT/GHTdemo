@@ -2,7 +2,7 @@ import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import FilterSection from './components/FilterSection';
 import DataTable from './components/DataTable';
 import { formsData } from './data/formsData';
-import { filterForms, getAutoCheckedForms, mergeCheckedState } from './utils/filterUtils';
+import { filterForms, getAutoCheckedForms, mergeCheckedState, getFormsFromEnabledLayers } from './utils/filterUtils';
 import './styles/App.css';
 
 function App() {
@@ -38,14 +38,14 @@ function App() {
     return mergeCheckedState(autoCheckedForms, manualOverrides);
   }, [autoCheckedForms, manualOverrides]);
 
-  // Forms to display - filtered forms + optionally additional forms
+  // Forms to display - filtered forms + optionally forms from enabled layers
   const displayForms = useMemo(() => {
     if (!showAdditional) {
       return filteredForms;
     }
-    // Show all forms when "追加表示" is enabled
-    return formsData;
-  }, [filteredForms, showAdditional]);
+    // Show all forms from enabled layers when "追加表示" is enabled
+    return getFormsFromEnabledLayers(formsData, filters);
+  }, [filteredForms, showAdditional, filters]);
 
   // Handle filter change
   const handleFilterChange = useCallback((newFilters) => {
