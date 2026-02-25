@@ -1,6 +1,14 @@
 import React, { useState, useMemo } from 'react';
-import { layerNames } from '../data/formsData';
-import { groupByLayer, getLayerDescription } from '../utils/filterUtils';
+import { groupNames } from '../data/formsData';
+import { groupByFormGroup, getGroupDescription } from '../utils/filterUtils';
+
+const GROUP_ORDER = ['A', 'B', 'C'];
+
+const GROUP_COLORS = {
+  A: { badge: '#4A9BAD', border: '#4A9BAD' },
+  B: { badge: '#6ABDD4', border: '#6ABDD4' },
+  C: { badge: '#E08050', border: '#E08050' },
+};
 
 const DataTable = ({
   forms,
@@ -8,17 +16,15 @@ const DataTable = ({
   checkedItems,
   autoCheckedForms,
   onCheckChange,
-  showAdditional,
-  onToggleAdditional
 }) => {
-  const [viewMode, setViewMode] = useState('checked'); // 'checked', 'unchecked'
+  const [viewMode, setViewMode] = useState('checked');
 
-  // Group forms by layer
-  const groupedForms = useMemo(() => groupByLayer(forms), [forms]);
+  // Group forms by form_group
+  const groupedForms = useMemo(() => groupByFormGroup(forms), [forms]);
 
   // Filter by view mode
-  const getVisibleForms = (layerForms) => {
-    return layerForms.filter((form) => {
+  const getVisibleForms = (groupForms) => {
+    return groupForms.filter((form) => {
       const isChecked = checkedItems[form.no] || false;
       if (viewMode === 'checked') return isChecked;
       if (viewMode === 'unchecked') return !isChecked;
@@ -31,22 +37,17 @@ const DataTable = ({
     let checked = 0;
     let unchecked = 0;
     forms.forEach((form) => {
-      if (checkedItems[form.no]) {
-        checked++;
-      } else {
-        unchecked++;
-      }
+      if (checkedItems[form.no]) checked++;
+      else unchecked++;
     });
     return { checked, unchecked, total: forms.length };
   }, [forms, checkedItems]);
 
-  // Toggle single checkbox - now passes formNo and new state
   const handleToggle = (formNo) => {
     const newState = !checkedItems[formNo];
     onCheckChange(formNo, newState);
   };
 
-  // Check if form is auto-checked (from filter) vs manually added
   const isAutoChecked = (formNo) => {
     return autoCheckedForms && autoCheckedForms[formNo];
   };
@@ -86,16 +87,6 @@ const DataTable = ({
             </button>
           </div>
         </div>
-        <div className="table-actions">
-          <label className="additional-toggle">
-            <input
-              type="checkbox"
-              checked={showAdditional}
-              onChange={onToggleAdditional}
-            />
-            追加表示
-          </label>
-        </div>
       </div>
 
       {/* Table Header */}
@@ -122,23 +113,27 @@ const DataTable = ({
           <div className="no-data">該当する書類がありません</div>
         )}
 
-        {/* Forms grouped by layer */}
-        {[1, 2, 3, 4].map((layer) => {
-          const layerForms = groupedForms[layer] || [];
-          const visibleForms = getVisibleForms(layerForms);
+        {/* Forms grouped by form_group */}
+        {GROUP_ORDER.map((group) => {
+          const groupForms = groupedForms[group] || [];
+          const visibleForms = getVisibleForms(groupForms);
 
           if (visibleForms.length === 0) return null;
 
+          const colors = GROUP_COLORS[group];
+
           return (
-            <React.Fragment key={layer}>
-              {/* Layer Header */}
-              <div className={`layer-group-header l${layer}`}>
-                <span className={`layer-badge l${layer}`}>{layerNames[layer]}</span>
-                <span>{getLayerDescription(layer)}</span>
+            <React.Fragment key={group}>
+              {/* Group Header */}
+              <div className="layer-group-header" style={{ borderLeftColor: colors.border }}>
+                <span className="layer-badge" style={{ backgroundColor: colors.badge }}>
+                  {groupNames[group]}
+                </span>
+                <span>{getGroupDescription(group)}</span>
                 <span className="layer-group-count">{visibleForms.length}件</span>
               </div>
 
-              {/* Layer Forms */}
+              {/* Group Forms */}
               {visibleForms.map((form, idx) => {
                 const isChecked = checkedItems[form.no] || false;
                 const isAuto = isAutoChecked(form.no);
