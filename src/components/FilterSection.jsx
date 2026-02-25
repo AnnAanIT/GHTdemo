@@ -102,7 +102,6 @@ const FilterSection = ({ filters, selectedTags, onFilterChange, onTagChange, onS
           <div className="filter-layers">
             {/* Layer 1: 在留資格 + 申請種別 */}
             <div className="filter-layer layer-0">
-              <span className="layer-number">1</span>
               <span className="layer-label">基本情報</span>
               <div className="filter-group">
                 <span className="filter-label">在留資格</span>
@@ -131,12 +130,10 @@ const FilterSection = ({ filters, selectedTags, onFilterChange, onTagChange, onS
                   </select>
                 </div>
               </div>
-              <span className="layer-status required">必須</span>
             </div>
 
             {/* Layer 2: 分野 (tokutei + basic info required) */}
             <div className={`filter-layer layer-1 ${!hasBasicInfo || !isTokutei ? 'disabled' : ''}`}>
-              <span className="layer-number">2</span>
               <span className="layer-label">分野</span>
               <div className="filter-group">
                 <div className="filter-select">
@@ -152,15 +149,14 @@ const FilterSection = ({ filters, selectedTags, onFilterChange, onTagChange, onS
                   </select>
                 </div>
               </div>
-              <span className={`layer-status ${!hasBasicInfo ? 'locked' : isTokutei ? 'required' : 'locked'}`}>
-                {!hasBasicInfo ? '基本情報を選択' : isTokutei ? '必須' : '特定技能のみ'}
+              <span className={`layer-status ${!hasBasicInfo ? 'locked' : isTokutei ? 'locked' : 'locked'}`}>
+                {!hasBasicInfo ? '基本情報を選択' : isTokutei ? '' : '特定技能のみ'}
               </span>
             </div>
 
             {/* Tags Section (requires basic info) */}
             {hasBasicInfo && (
               <div className="filter-layer layer-2 tag-layer">
-                <span className="layer-number">T</span>
                 <span className="layer-label">条件</span>
                 <div className="tag-controls">
                   {/* Org type select */}
@@ -206,20 +202,6 @@ const FilterSection = ({ filters, selectedTags, onFilterChange, onTagChange, onS
                           <option key={tag} value={tag}>{TAG_DEFINITIONS[tag].label}</option>
                         ))}
                       </select>
-                    </div>
-                  )}
-
-                  {/* Support org checkbox (only for tokutei1) */}
-                  {visa === 'tokutei1' && (
-                    <div className="tag-group-control">
-                      <label className="tag-checkbox">
-                        <input
-                          type="checkbox"
-                          checked={selectedTags.includes('support_org')}
-                          onChange={() => handleTagToggle('support_org')}
-                        />
-                        登録支援機関に委託
-                      </label>
                     </div>
                   )}
                 </div>
