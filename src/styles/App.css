@@ -424,7 +424,7 @@ body {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-md);
+  /* margin-bottom: var(--spacing-md); */
 }
 
 .filter-warning::before {
@@ -627,7 +627,7 @@ body {
 .table-header > div {
   padding: 10px 8px;
   text-align: center;
-  border-right: 1px solid rgba(255,255,255,0.3);
+  border-right: 1px solid rgba(255,255,255,0.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -677,6 +677,11 @@ body {
   font-size: var(--font-size-base);
   display: flex;
   align-items: center;
+  border-right: 1px solid #e8ecf0;
+}
+
+.table-row > div:last-child {
+  border-right: none;
 }
 
 .table-row .col-no {
