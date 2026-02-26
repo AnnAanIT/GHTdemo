@@ -123,9 +123,9 @@ export function groupByFormGroup(forms) {
  */
 export function getGroupDescription(group) {
   const descriptions = {
-    A: '別記様式・参考様式・第1表',
-    B: '分野参考様式・第3表',
-    C: '第2表・派遣用書類',
+    A: '省令様式・参考様式',
+    B: '分野参考様式',
+    C: '別表・派遣用書類',
   };
   return descriptions[group] || '';
 }
