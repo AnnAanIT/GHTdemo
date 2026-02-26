@@ -8,7 +8,7 @@
 
 body {
   font-family: var(--font-family);
-  /* background-color: var(--color-bg); */
+  background-color: var(--color-bg);
   color: var(--color-text);
   font-size: var(--font-size-md);
   line-height: 1.5;
@@ -82,13 +82,13 @@ body {
   display: flex;
   gap: 1px;
   padding: 0 12px;
-  /* background: #f0f2f5; */
+  background:var(--color-bg);
   /* border-bottom: 1px solid #9aaebf; */
 }
 
 .tab {
   padding: 8px 20px;
-  /* border-radius: var(--radius-sm) var(--radius-sm) 0 0; */
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
   cursor: pointer;
   font-size: var(--font-size-base);
   font-weight: 500;
