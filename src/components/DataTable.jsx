@@ -33,6 +33,7 @@ const IconEdit = () => (
   </svg>
 );
 
+
 const IconDelete = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <polyline points="3 6 5 6 21 6"/>
@@ -80,6 +81,14 @@ const UploadCell = ({ formNo, uploadedFiles, onFileChange }) => {
   );
 };
 
+const TODAY = (() => {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}年${m}月${day}日`;
+})();
+
 const DataTable = ({
   forms,
   showWarning,
@@ -91,6 +100,8 @@ const DataTable = ({
 }) => {
   const [viewMode, setViewMode] = useState('checked');
   const [uploadedFiles, setUploadedFiles] = useState({});
+  const [newRows, setNewRows] = useState([]);
+  const [newRowChecked, setNewRowChecked] = useState({});
 
   const groupedForms = useMemo(() => groupByFormGroup(forms), [forms]);
 
@@ -126,12 +137,20 @@ const DataTable = ({
     return autoCheckedForms && autoCheckedForms[formNo];
   };
 
-  React.useEffect(() => {
-    const totalEl = document.getElementById('totalCount');
-    const checkedEl = document.getElementById('checkedCount');
-    if (totalEl) totalEl.textContent = counts.total;
-    if (checkedEl) checkedEl.textContent = `選択：${counts.checked}件 / 未選択：${counts.unchecked}件`;
-  }, [counts]);
+  const handleAddRow = () => {
+    const id = `new-${Date.now()}`;
+    setNewRows(prev => [...prev, { id, form_no: '', form_name: '', annai_bunsho: '', updater: '' }]);
+    setNewRowChecked(prev => ({ ...prev, [id]: false }));
+  };
+
+  const handleNewRowChange = (id, field, value) => {
+    setNewRows(prev => prev.map(r => r.id === id ? { ...r, [field]: value } : r));
+  };
+
+  const handleDeleteNewRow = (id) => {
+    setNewRows(prev => prev.filter(r => r.id !== id));
+    setNewRowChecked(prev => { const next = { ...prev }; delete next[id]; return next; });
+  };
 
   // Build grid columns based on active optional columns
   const gridCols = [
@@ -139,6 +158,7 @@ const DataTable = ({
     '50px',                              // 必須
     showSampleFile ? '180px' : '300px',  // 様式番号
     '1fr',                               // 書類名 (残りスペースを使用)
+    showSampleFile ? '240px' : null,     // 案内文書
     showSampleFile ? '120px' : null,     // サンプルファイル
     '90px',                              // 更新者
     '110px',                             // 更新日時
@@ -171,6 +191,13 @@ const DataTable = ({
             </button>
           </div>
         </div>
+        {showActions && (
+          <div className="table-toolbar-right">
+            <button className="btn-add-row" onClick={handleAddRow}>
+              + 追加
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Table Header */}
@@ -179,6 +206,7 @@ const DataTable = ({
         <div>必須</div>
         <div>様式番号</div>
         <div style={{ justifyContent: 'flex-start', paddingLeft: '14px' }}>書類名</div>
+        {showSampleFile && <div>案内文書</div>}
         {showSampleFile && <div>サンプル ファイル</div>}
         <div>更新者</div>
         <div>更新日時</div>
@@ -244,6 +272,11 @@ const DataTable = ({
                     <div className="col-form-no">{form.form_no}</div>
                     <div className="col-form-name">{form.form_name}</div>
                     {showSampleFile && (
+                      <div className="col-annai-bunsho">
+                        {form.annai_bunsho || '—'}
+                      </div>
+                    )}
+                    {showSampleFile && (
                       <UploadCell
                         formNo={form.no}
                         uploadedFiles={uploadedFiles}
@@ -268,6 +301,79 @@ const DataTable = ({
             </React.Fragment>
           );
         })}
+
+        {/* New rows added by 追加 button */}
+        {newRows.map((row, idx) => (
+          <div
+            key={row.id}
+            className="table-row new-row"
+            style={{ gridTemplateColumns: gridCols }}
+          >
+            <div className="col-no">{forms.length + idx + 1}</div>
+            <div className="col-required">
+              <div className="checkbox-wrapper">
+                <input
+                  type="checkbox"
+                  checked={newRowChecked[row.id] || false}
+                  onChange={() => setNewRowChecked(prev => ({ ...prev, [row.id]: !prev[row.id] }))}
+                />
+              </div>
+            </div>
+            <div className="col-form-no">
+              <input
+                type="text"
+                className="cell-input"
+                value={row.form_no}
+                placeholder="様式番号"
+                onChange={e => handleNewRowChange(row.id, 'form_no', e.target.value)}
+              />
+            </div>
+            <div className="col-form-name">
+              <input
+                type="text"
+                className="cell-input"
+                value={row.form_name}
+                placeholder="書類名を入力..."
+                onChange={e => handleNewRowChange(row.id, 'form_name', e.target.value)}
+              />
+            </div>
+            {showSampleFile && (
+              <div className="col-annai-bunsho">
+                <input
+                  type="text"
+                  className="cell-input"
+                  value={row.annai_bunsho}
+                  placeholder="案内文書"
+                  onChange={e => handleNewRowChange(row.id, 'annai_bunsho', e.target.value)}
+                />
+              </div>
+            )}
+            {showSampleFile && (
+              <UploadCell
+                formNo={row.id}
+                uploadedFiles={uploadedFiles}
+                onFileChange={handleFileChange}
+              />
+            )}
+            <div className="col-updater">
+              <input
+                type="text"
+                className="cell-input"
+                value={row.updater}
+                placeholder="更新者"
+                onChange={e => handleNewRowChange(row.id, 'updater', e.target.value)}
+              />
+            </div>
+            <div className="col-updated">{TODAY}</div>
+            {showActions && (
+              <div className="col-actions">
+                <button className="btn-action delete" title="削除" onClick={() => handleDeleteNewRow(row.id)}>
+                  <IconDelete />
+                </button>
+              </div>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );

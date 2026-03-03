@@ -541,6 +541,59 @@ body {
   gap: var(--spacing-md);
 }
 
+.table-toolbar-right {
+  display: flex;
+  align-items: center;
+}
+
+.btn-add-row {
+  background: #0099CC;
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 5px 14px;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-add-row:hover {
+  background: #007aa3;
+}
+
+.table-row.new-row {
+  background: #f0f9ff;
+  border-left: 3px solid #0099CC;
+}
+
+.table-row.new-row .col-form-no,
+.table-row.new-row .col-form-name,
+.table-row.new-row .col-annai-bunsho,
+.table-row.new-row .col-updater {
+  padding: 4px 6px;
+}
+
+.cell-input {
+  width: 100%;
+  border: 1px solid #c8d8e8;
+  border-radius: 3px;
+  padding: 3px 6px;
+  font-size: var(--font-size-xs);
+  color: var(--color-text);
+  background: #fff;
+  outline: none;
+}
+
+.cell-input:focus {
+  border-color: #0099CC;
+  box-shadow: 0 0 0 2px rgba(0,153,204,0.15);
+}
+
+.cell-input::placeholder {
+  color: #b0b8c0;
+}
+
 .table-toolbar-title {
   font-size: var(--font-size-md);
   font-weight: 600;
@@ -755,6 +808,14 @@ body {
 .btn-sample.uploaded:hover {
   background: #4caf50;
   color: #fff;
+}
+
+.table-row .col-annai-bunsho {
+  justify-content: flex-start;
+  padding: 4px 8px;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  line-height: 1.4;
 }
 
 .table-row .col-actions {

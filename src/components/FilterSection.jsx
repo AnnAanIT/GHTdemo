@@ -221,14 +221,6 @@ const FilterSection = ({ filters, selectedTags, onFilterChange, onTagChange, onS
               />
               <button className="btn-search" onClick={onSearch}>検索</button>
             </div>
-            <div className="result-info">
-              <div className="result-count">
-                該当：<strong id="totalCount">0</strong> 件
-              </div>
-              <div className="result-detail" id="checkedCount">
-                選択：0件 / 未選択：0件
-              </div>
-            </div>
           </div>
         </div>
       )}
