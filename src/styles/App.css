@@ -21,6 +21,32 @@ body {
   padding: var(--spacing-lg) var(--spacing-xl);
 }
 
+/* ===== Breadcrumb ===== */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+  font-size: 15px;
+}
+
+.breadcrumb-link {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.breadcrumb-link:hover {
+  text-decoration: underline;
+}
+
+.breadcrumb-sep {
+  color: #aab4be;
+}
+
+.breadcrumb-current {
+  color: var(--color-text-secondary);
+}
+
 /* ===== Page Header ===== */
 .page-header {
   display: flex;

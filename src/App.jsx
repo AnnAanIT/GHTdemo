@@ -25,6 +25,13 @@ function App() {
 
   return (
     <div className="container">
+      {/* Breadcrumb */}
+      <nav className="breadcrumb">
+        <a href="#" className="breadcrumb-link">ホーム</a>
+        <span className="breadcrumb-sep">/</span>
+        <span className="breadcrumb-current">申請書類管理</span>
+      </nav>
+
       {/* Page Header */}
       <div className="page-header">
         <h1 className="page-title">申請書類管理</h1>
