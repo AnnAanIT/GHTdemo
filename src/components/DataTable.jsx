@@ -1,4 +1,5 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { groupNames } from '../data/formsData';
 import { groupByFormGroup, getGroupDescription } from '../utils/filterUtils';
 
@@ -89,6 +90,215 @@ const TODAY = (() => {
   return `${y}年${m}月${day}日`;
 })();
 
+const AllTypesModal = ({ allForms, onClose }) => {
+  const groupedForms = useMemo(() => groupByFormGroup(allForms), [allForms]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
+  const gridCols = '40px 240px 1fr 90px 110px';
+
+  return createPortal(
+    <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="modal-container">
+        <div className="modal-header">
+          <div className="modal-title-area">
+            <span className="modal-title-text">全種類</span>
+            <span className="modal-total-count">全{allForms.length}件</span>
+          </div>
+          <button className="modal-close-btn" onClick={onClose}>✕</button>
+        </div>
+        <div className="modal-body">
+          {allForms.length === 0 ? (
+            <div className="no-data">データがありません</div>
+          ) : (
+            <>
+              <div className="modal-table-header" style={{ gridTemplateColumns: gridCols }}>
+                <div>No.</div>
+                <div>様式番号</div>
+                <div style={{ justifyContent: 'flex-start', paddingLeft: '14px' }}>書類名</div>
+                <div>更新者</div>
+                <div>更新日時</div>
+              </div>
+              {GROUP_ORDER.map(group => {
+                const groupForms = groupedForms[group] || [];
+                if (groupForms.length === 0) return null;
+                const colors = GROUP_COLORS[group];
+                return (
+                  <React.Fragment key={group}>
+                    <div className="layer-group-header" style={{ borderLeftColor: colors.border }}>
+                      <span className="layer-badge" style={{ backgroundColor: colors.badge }}>
+                        {groupNames[group]}
+                      </span>
+                      <span>{getGroupDescription(group)}</span>
+                      <span className="layer-group-count">{groupForms.length}件</span>
+                    </div>
+                    {groupForms.map((form, idx) => (
+                      <div
+                        key={form.no}
+                        className={`modal-table-row${idx % 2 === 1 ? ' even-row' : ''}`}
+                        style={{ gridTemplateColumns: gridCols }}
+                      >
+                        <div className="col-no">{idx + 1}</div>
+                        <div className="col-form-no">{form.form_no}</div>
+                        <div className="col-form-name">{form.form_name}</div>
+                        <div className="col-updater">田中 太郎</div>
+                        <div className="col-updated">2024年01月15日</div>
+                      </div>
+                    ))}
+                  </React.Fragment>
+                );
+              })}
+            </>
+          )}
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+};
+
+const AddEditFormModal = ({ mode = 'add', onClose }) => {
+  const [shoruiName, setShoruiName] = useState('');
+  const [yoshikiNo, setYoshikiNo] = useState('');
+  const [annai, setAnnai] = useState('');
+  const [isRequired, setIsRequired] = useState(true);
+  const [files, setFiles] = useState([]);
+  const fileInputRef = useRef(null);
+
+  const title = mode === 'add' ? '様式書類追加' : '様式種類編集';
+
+  useEffect(() => {
+    const handleKeyDown = (e) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
+  const handleFileChange = (e) => {
+    const newFiles = Array.from(e.target.files).filter(f => f.type === 'application/pdf');
+    setFiles(prev => [...prev, ...newFiles].slice(0, 5));
+    e.target.value = '';
+  };
+
+  return createPortal(
+    <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="addedit-container">
+        <div className="addedit-header">
+          <span className="addedit-title">{title}</span>
+          <button className="modal-close-btn" onClick={onClose}>✕</button>
+        </div>
+
+        <div className="addedit-body">
+          {/* 書類名 */}
+          <div className="addedit-row">
+            <label className="addedit-label">
+              書類名 <span className="field-required">*</span>
+            </label>
+            <div className="addedit-input-wrap">
+              <input
+                type="text"
+                className="addedit-input"
+                placeholder="書類名を入力してください"
+                value={shoruiName}
+                onChange={e => setShoruiName(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* 様式番号 */}
+          <div className="addedit-row">
+            <label className="addedit-label">
+              様式番号 <span className="field-required">*</span>
+            </label>
+            <div className="addedit-input-wrap">
+              <input
+                type="text"
+                className="addedit-input"
+                placeholder="様式番号を入力してください"
+                value={yoshikiNo}
+                onChange={e => setYoshikiNo(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* 案内文書 */}
+          <div className="addedit-row">
+            <label className="addedit-label">案内文書</label>
+            <div className="addedit-input-wrap">
+              <textarea
+                className="addedit-textarea"
+                placeholder="案内文書を入力してください"
+                value={annai}
+                onChange={e => setAnnai(e.target.value)}
+                rows={3}
+              />
+            </div>
+          </div>
+
+          {/* サンプルファイル */}
+          <div className="addedit-row">
+            <label className="addedit-label">サンプルファイル</label>
+            <div className="addedit-input-wrap">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".pdf"
+                multiple
+                style={{ display: 'none' }}
+                onChange={handleFileChange}
+              />
+              {files.length < 5 && (
+                <button className="btn-addedit-upload" onClick={() => fileInputRef.current.click()}>
+                  <IconUpload /> Upload
+                </button>
+              )}
+              {files.length > 0 && (
+                <div className="addedit-file-list">
+                  {files.map((file, idx) => (
+                    <div key={idx} className="addedit-file-item">
+                      <IconFileCheck />
+                      <span>{file.name}</span>
+                      <button
+                        className="addedit-file-remove"
+                        onClick={() => setFiles(prev => prev.filter((_, i) => i !== idx))}
+                      >✕</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <p className="addedit-upload-hint">PDFファイル、最大5件</p>
+            </div>
+          </div>
+
+          {/* 書類タイプ */}
+          <div className="addedit-row">
+            <label className="addedit-label">書類タイプ</label>
+            <div className="addedit-input-wrap">
+              <label className="addedit-checkbox">
+                <input
+                  type="checkbox"
+                  checked={isRequired}
+                  onChange={e => setIsRequired(e.target.checked)}
+                />
+                <span>必須</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div className="addedit-footer">
+          <button className="btn-addedit-cancel" onClick={onClose}>キャンセル</button>
+          <button className="btn-addedit-save">保存</button>
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+};
+
 const DataTable = ({
   forms,
   showWarning,
@@ -97,8 +307,12 @@ const DataTable = ({
   onCheckChange,
   showSampleFile = false,
   showActions = false,
+  showAllTypes = false,
+  allForms = [],
 }) => {
   const [viewMode, setViewMode] = useState('checked');
+  const [showModal, setShowModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState({});
   const [newRows, setNewRows] = useState([]);
   const [newRowChecked, setNewRowChecked] = useState({});
@@ -191,11 +405,18 @@ const DataTable = ({
             </button>
           </div>
         </div>
-        {showActions && (
+        {(showActions || showAllTypes) && (
           <div className="table-toolbar-right">
-            <button className="btn-add-row" onClick={handleAddRow}>
-              + 追加
-            </button>
+            {showAllTypes && (
+              <button className="btn-all-types" onClick={() => setShowModal(true)}>
+                全種類
+              </button>
+            )}
+            {showActions && (
+              <button className="btn-add-row" onClick={() => setShowAddModal(true)}>
+                + 追加
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -217,7 +438,7 @@ const DataTable = ({
       <div className="table-body">
         {showWarning && (
           <div className="filter-warning">
-            在留資格を選択してください。現在すべての書類を表示しています。
+            在留資格と申請種別を選択してください。
           </div>
         )}
 
@@ -375,6 +596,19 @@ const DataTable = ({
           </div>
         ))}
       </div>
+
+      {showModal && (
+        <AllTypesModal
+          allForms={allForms}
+          onClose={() => setShowModal(false)}
+        />
+      )}
+      {showAddModal && (
+        <AddEditFormModal
+          mode="add"
+          onClose={() => setShowAddModal(false)}
+        />
+      )}
     </div>
   );
 };

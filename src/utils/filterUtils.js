@@ -82,9 +82,9 @@ export function filterForms(formsData, filters, selectedTags = []) {
   const { visa, sector } = filters;
   const isTokutei = visa === 'tokutei1' || visa === 'tokutei2';
 
-  // No visa selected → show all with warning
-  if (!visa) {
-    return { filteredForms: formsData, showWarning: true };
+  // visa or appType not selected → show empty with warning
+  if (!visa || !filters.appType) {
+    return { filteredForms: [], showWarning: true };
   }
 
   const filteredForms = formsData.filter(form => {

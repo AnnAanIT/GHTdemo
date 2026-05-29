@@ -134,7 +134,7 @@ const FilterSection = ({ filters, selectedTags, onFilterChange, onTagChange, onS
 
             {/* Layer 2: 分野 (tokutei + basic info required) */}
             <div className={`filter-layer layer-1 ${!hasBasicInfo || !isTokutei ? 'disabled' : ''}`}>
-              <span className="layer-label">分野</span>
+              <span className="layer-label">特定技能分野</span>
               <div className="filter-group">
                 <div className="filter-select">
                   <select
@@ -161,7 +161,7 @@ const FilterSection = ({ filters, selectedTags, onFilterChange, onTagChange, onS
                 <div className="tag-controls">
                   {/* Org type select */}
                   <div className="tag-group-control">
-                    <span className="tag-group-label">機関種別</span>
+                    <span className="tag-group-label">法人区分</span>
                     <select
                       value={getGroupSelectValue('org_type')}
                       onChange={(e) => handleTagSelect('org_type', e.target.value)}

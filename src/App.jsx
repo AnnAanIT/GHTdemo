@@ -7,7 +7,7 @@ import './styles/App.css';
 const TABS = [
   { key: 'shinseinin', label: '申請人書類', storageKey: 'shinseinin-data', showSampleFile: true, showActions: true, formsDataProp: shinseininForms },
   { key: 'shokkikan', label: '所属機関書類', storageKey: 'shokkikan-data', showSampleFile: true, showActions: true, formsDataProp: shokkikanForms },
-  { key: 'online', label: 'オンライン作成書類', storageKey: 'shinsei-shorui-data', showSampleFile: false, showActions: false, formsDataProp: undefined },
+  { key: 'online', label: 'オンライン作成書類', storageKey: 'shinsei-shorui-data', showSampleFile: false, showActions: false, showAllTypes: true, formsDataProp: undefined },
 ];
 
 function App() {
@@ -64,6 +64,7 @@ function App() {
               storageKey={tab.storageKey}
               showSampleFile={tab.showSampleFile}
               showActions={tab.showActions}
+              showAllTypes={tab.showAllTypes || false}
               formsDataProp={tab.formsDataProp}
               onHasChangesChange={(val) => handleHasChanges(tab.key, val)}
             />
