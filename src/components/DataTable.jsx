@@ -438,7 +438,7 @@ const DataTable = ({
       <div className="table-body">
         {showWarning && (
           <div className="filter-warning">
-            在留資格と申請種別を選択してください。
+            在留資格と申請区分を選択してください。
           </div>
         )}
 

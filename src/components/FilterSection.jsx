@@ -116,14 +116,14 @@ const FilterSection = ({ filters, selectedTags, onFilterChange, onTagChange, onS
               </div>
               <span className="layer-connector">+</span>
               <div className="filter-group">
-                <span className="filter-label">申請種別</span>
+                <span className="filter-label">申請区分</span>
                 <div className="filter-select">
                   <select
                     value={appType}
                     onChange={(e) => onFilterChange({ ...filters, appType: e.target.value })}
                     disabled={!visa}
                   >
-                    <option value="">-- 選択 --</option>
+                    <option value="">-- 選択してください --</option>
                     {appTypes.map((a) => (
                       <option key={a.value} value={a.value}>{a.label}</option>
                     ))}
@@ -166,7 +166,7 @@ const FilterSection = ({ filters, selectedTags, onFilterChange, onTagChange, onS
                       value={getGroupSelectValue('org_type')}
                       onChange={(e) => handleTagSelect('org_type', e.target.value)}
                     >
-                      <option value="">未定</option>
+                      <option value="">-- 選択してください --</option>
                       {TAG_GROUPS.org_type.options.map(tag => (
                         <option key={tag} value={tag}>{TAG_DEFINITIONS[tag].label}</option>
                       ))}
@@ -181,7 +181,7 @@ const FilterSection = ({ filters, selectedTags, onFilterChange, onTagChange, onS
                         value={getGroupSelectValue('category')}
                         onChange={(e) => handleTagSelect('category', e.target.value)}
                       >
-                        <option value="">未定</option>
+                        <option value="">-- 選択してください --</option>
                         {getCategoryOptions().map(tag => (
                           <option key={tag} value={tag}>{TAG_DEFINITIONS[tag].label}</option>
                         ))}
@@ -197,7 +197,7 @@ const FilterSection = ({ filters, selectedTags, onFilterChange, onTagChange, onS
                         value={getGroupSelectValue('employment')}
                         onChange={(e) => handleTagSelect('employment', e.target.value)}
                       >
-                        <option value="">未定</option>
+                        <option value="">-- 選択してください --</option>
                         {TAG_GROUPS.employment.options.map(tag => (
                           <option key={tag} value={tag}>{TAG_DEFINITIONS[tag].label}</option>
                         ))}
@@ -214,7 +214,7 @@ const FilterSection = ({ filters, selectedTags, onFilterChange, onTagChange, onS
             <div className="search-box">
               <input
                 type="text"
-                placeholder="様式名で検索..."
+                placeholder="書類名又は様式番号で検索..."
                 value={searchText}
                 onChange={(e) => onFilterChange({ ...filters, searchText: e.target.value })}
                 onKeyUp={(e) => e.key === 'Enter' && onSearch()}
