@@ -438,7 +438,10 @@ const DataTable = ({
       <div className="table-body">
         {showWarning && (
           <div className="filter-warning">
-            在留資格と申請区分を選択してください。
+            {showAllTypes
+              ? '在留資格と申請区分を選択してください。全種類は「種類一覧」から確認できます。'
+              : '在留資格と申請区分を選択してください。'
+            }
           </div>
         )}
 
