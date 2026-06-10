@@ -78,10 +78,9 @@ body {
 .btn-save {
   background: #0099CC;
   border: 1px solid #0088bb;
-  padding: 10px 40px;
-  margin-top: 50px;
+  padding: 5px 14px;
   border-radius: var(--radius-sm);
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-sm);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;

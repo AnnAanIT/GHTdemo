@@ -35,12 +35,6 @@ function App() {
       {/* Page Header */}
       <div className="page-header">
         <h1 className="page-title">申請書類管理</h1>
-        <button
-          className={`btn-save ${hasChangesMap[activeTab] ? 'has-changes' : ''}`}
-          onClick={handleSave}
-        >
-          保存
-        </button>
       </div>
 
       {/* Main card — tabs + content */}
@@ -67,6 +61,8 @@ function App() {
               showAllTypes={tab.showAllTypes || false}
               formsDataProp={tab.formsDataProp}
               onHasChangesChange={(val) => handleHasChanges(tab.key, val)}
+              onSave={tab.key === activeTab ? handleSave : undefined}
+              hasChanges={hasChangesMap[tab.key]}
             />
           </div>
         ))}

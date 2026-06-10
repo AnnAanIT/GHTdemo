@@ -20,7 +20,7 @@ function loadSavedData(storageKey) {
   }
 }
 
-const TabContent = forwardRef(({ storageKey, showSampleFile = false, showActions = false, showAllTypes = false, formsDataProp, onHasChangesChange }, ref) => {
+const TabContent = forwardRef(({ storageKey, showSampleFile = false, showActions = false, showAllTypes = false, formsDataProp, onHasChangesChange, onSave, hasChanges }, ref) => {
   const formsData = useMemo(() => formsDataProp || defaultFormsData, [formsDataProp]);
   const saved = useMemo(() => loadSavedData(storageKey), [storageKey]);
 
@@ -145,6 +145,8 @@ const TabContent = forwardRef(({ storageKey, showSampleFile = false, showActions
         showActions={showActions}
         showAllTypes={showAllTypes}
         allForms={formsData}
+        onSave={onSave || handleSave}
+        hasChanges={hasChanges ?? hasUnsavedChanges}
       />
     </div>
   );

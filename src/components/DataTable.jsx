@@ -106,7 +106,7 @@ const AllTypesModal = ({ allForms, onClose }) => {
       <div className="modal-container">
         <div className="modal-header">
           <div className="modal-title-area">
-            <span className="modal-title-text">全種類</span>
+            <span className="modal-title-text">全書類</span>
             <span className="modal-total-count">全{allForms.length}件</span>
           </div>
           <button className="modal-close-btn" onClick={onClose}>✕</button>
@@ -309,6 +309,8 @@ const DataTable = ({
   showActions = false,
   showAllTypes = false,
   allForms = [],
+  onSave,
+  hasChanges = false,
 }) => {
   const [viewMode, setViewMode] = useState('checked');
   const [showModal, setShowModal] = useState(false);
@@ -405,20 +407,24 @@ const DataTable = ({
             </button>
           </div>
         </div>
-        {(showActions || showAllTypes) && (
-          <div className="table-toolbar-right">
-            {showAllTypes && (
-              <button className="btn-all-types" onClick={() => setShowModal(true)}>
-                全種類
-              </button>
-            )}
-            {showActions && (
-              <button className="btn-add-row" onClick={() => setShowAddModal(true)}>
-                + 追加
-              </button>
-            )}
-          </div>
-        )}
+        <div className="table-toolbar-right">
+          {showAllTypes && (
+            <button className="btn-all-types" onClick={() => setShowModal(true)}>
+              全書類
+            </button>
+          )}
+          {showActions && (
+            <button className="btn-add-row" onClick={() => setShowAddModal(true)}>
+              + 追加
+            </button>
+          )}
+          <button
+            className={`btn-save ${hasChanges ? 'has-changes' : ''}`}
+            onClick={onSave}
+          >
+            保存
+          </button>
+        </div>
       </div>
 
       {/* Table Header */}
@@ -439,7 +445,7 @@ const DataTable = ({
         {showWarning && (
           <div className="filter-warning">
             {showAllTypes
-              ? '在留資格と申請区分を選択してください。全種類は「種類一覧」から確認できます。'
+              ? '在留資格と申請区分を選択してください。全書類は「書類一覧」から確認できます。'
               : '在留資格と申請区分を選択してください。'
             }
           </div>
