@@ -85,7 +85,6 @@ body {
   cursor: pointer;
   transition: background 0.15s;
   color: white;
-  margin-left: 8px;
 }
 
 .btn-save:hover {
