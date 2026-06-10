@@ -76,21 +76,20 @@ body {
 } */
 
 .btn-save {
-  background: #0099CC;
-  border: 1px solid #0088bb;
+  background: var(--color-primary);
+  border: none;
   padding: 5px 14px;
   border-radius: var(--radius-sm);
   font-size: var(--font-size-sm);
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background 0.15s;
   color: white;
-  letter-spacing: 0.5px;
+  margin-left: 8px;
 }
 
 .btn-save:hover {
-  background: #007aa3;
-  border-color: #006b8f;
+  background: var(--color-primary-dark);
 }
 
 /* ===== Main Card ===== */
@@ -145,12 +144,10 @@ body {
 
 .btn-save.has-changes {
   background: #e07020;
-  border-color: #c06010;
 }
 
 .btn-save.has-changes:hover {
   background: #c06010;
-  border-color: #a05000;
 }
 
 /* ===== Filter Section ===== */
@@ -569,10 +566,11 @@ body {
 .table-toolbar-right {
   display: flex;
   align-items: center;
+  gap: 8px;
 }
 
 .btn-add-row {
-  background: #0099CC;
+  background: var(--color-primary);
   color: #fff;
   border: none;
   border-radius: var(--radius-sm);
@@ -584,7 +582,7 @@ body {
 }
 
 .btn-add-row:hover {
-  background: #007aa3;
+  background: var(--color-primary-dark);
 }
 
 .table-row.new-row {
