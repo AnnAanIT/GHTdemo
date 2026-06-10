@@ -406,6 +406,18 @@ const DataTable = ({
               未選択のみ ({counts.unchecked})
             </button>
           </div>
+        </div>
+        <div className="table-toolbar-right">
+          {showAllTypes && (
+            <button className="btn-all-types" onClick={() => setShowModal(true)}>
+              全書類
+            </button>
+          )}
+          {showActions && (
+            <button className="btn-add-row" onClick={() => setShowAddModal(true)}>
+              + 追加
+            </button>
+          )}
           <button
             className={`btn-save ${hasChanges ? 'has-changes' : ''}`}
             onClick={onSave}
@@ -413,20 +425,6 @@ const DataTable = ({
             保存
           </button>
         </div>
-        {(showAllTypes || showActions) && (
-          <div className="table-toolbar-right">
-            {showAllTypes && (
-              <button className="btn-all-types" onClick={() => setShowModal(true)}>
-                全書類
-              </button>
-            )}
-            {showActions && (
-              <button className="btn-add-row" onClick={() => setShowAddModal(true)}>
-                + 追加
-              </button>
-            )}
-          </div>
-        )}
       </div>
 
       {/* Table Header */}
