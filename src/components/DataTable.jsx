@@ -334,7 +334,7 @@ const PreviewModal = ({ form, onClose }) => {
             </div>
             <div className="preview-doc-title">{form.form_name}</div>
             <div className="preview-no-file">
-              <IconFileCheck />
+              <IconPreview />
               <span>サンプルファイルは未登録です</span>
             </div>
           </div>
@@ -552,21 +552,14 @@ const DataTable = ({
                         {form.annai_bunsho || '—'}
                       </div>
                     )}
-                    {showSampleFile && (
-                      <UploadCell
-                        formNo={form.no}
-                        uploadedFiles={uploadedFiles}
-                        onFileChange={handleFileChange}
-                      />
-                    )}
-                    {showPreviewFile && (
+                    {(showSampleFile || showPreviewFile) && (
                       <div className="col-sample-preview">
                         <button
                           className="btn-preview"
                           title="プレビュー"
                           onClick={() => setPreviewForm(form)}
                         >
-                          <IconFileCheck />
+                          <IconPreview />
                         </button>
                       </div>
                     )}
