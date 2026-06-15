@@ -408,6 +408,12 @@ const DataTable = ({
           </div>
         </div>
         <div className="table-toolbar-right">
+          <button
+            className={`btn-save ${hasChanges ? 'has-changes' : ''}`}
+            onClick={onSave}
+          >
+            保存
+          </button>
           {showAllTypes && (
             <button className="btn-all-types" onClick={() => setShowModal(true)}>
               全書類
@@ -418,12 +424,6 @@ const DataTable = ({
               + 追加
             </button>
           )}
-          <button
-            className={`btn-save ${hasChanges ? 'has-changes' : ''}`}
-            onClick={onSave}
-          >
-            保存
-          </button>
         </div>
       </div>
 
