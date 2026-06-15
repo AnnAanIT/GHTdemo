@@ -45,6 +45,13 @@ const IconDelete = () => (
   </svg>
 );
 
+const IconEye = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+    <circle cx="12" cy="12" r="3"/>
+  </svg>
+);
+
 const UploadCell = ({ formNo, uploadedFiles, onFileChange }) => {
   const inputRef = useRef(null);
   const file = uploadedFiles[formNo];
@@ -299,6 +306,42 @@ const AddEditFormModal = ({ mode = 'add', onClose }) => {
   );
 };
 
+const PreviewModal = ({ form, onClose }) => {
+  useEffect(() => {
+    const handleKeyDown = (e) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
+  return createPortal(
+    <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="preview-container">
+        <div className="preview-header">
+          <div className="preview-title-area">
+            <span className="preview-form-no">{form.form_no}</span>
+            <span className="preview-form-name">{form.form_name}</span>
+          </div>
+          <button className="modal-close-btn" onClick={onClose}>✕</button>
+        </div>
+        <div className="preview-body">
+          <div className="preview-doc-frame">
+            <div className="preview-doc-header">
+              <div className="preview-doc-badge">{form.form_group}</div>
+              <span>{form.form_no}</span>
+            </div>
+            <div className="preview-doc-title">{form.form_name}</div>
+            <div className="preview-no-file">
+              <IconFileCheck />
+              <span>サンプルファイルは未登録です</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+};
+
 const DataTable = ({
   forms,
   showWarning,
@@ -308,6 +351,7 @@ const DataTable = ({
   showSampleFile = false,
   showActions = false,
   showAllTypes = false,
+  showPreviewFile = false,
   allForms = [],
   onSave,
   hasChanges = false,
@@ -315,6 +359,7 @@ const DataTable = ({
   const [viewMode, setViewMode] = useState('checked');
   const [showModal, setShowModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [previewForm, setPreviewForm] = useState(null);
   const [uploadedFiles, setUploadedFiles] = useState({});
   const [newRows, setNewRows] = useState([]);
   const [newRowChecked, setNewRowChecked] = useState({});
@@ -370,15 +415,15 @@ const DataTable = ({
 
   // Build grid columns based on active optional columns
   const gridCols = [
-    '40px',                              // No.
-    '50px',                              // 必須
-    showSampleFile ? '180px' : '300px',  // 様式番号
-    '1fr',                               // 書類名 (残りスペースを使用)
-    showSampleFile ? '240px' : null,     // 案内文書
-    showSampleFile ? '120px' : null,     // サンプルファイル
-    '90px',                              // 更新者
-    '110px',                             // 更新日時
-    showActions ? '56px' : null,         // アクション
+    '40px',                                                         // No.
+    '50px',                                                         // 必須
+    showSampleFile ? '180px' : showPreviewFile ? '240px' : '300px', // 様式番号
+    '1fr',                                                          // 書類名
+    showSampleFile ? '240px' : null,                                // 案内文書
+    (showSampleFile || showPreviewFile) ? '100px' : null,           // サンプルファイル
+    '90px',                                                         // 更新者
+    '110px',                                                        // 更新日時
+    showActions ? '56px' : null,                                    // アクション
   ].filter(Boolean).join(' ');
 
   return (
@@ -434,7 +479,7 @@ const DataTable = ({
         <div>様式番号</div>
         <div style={{ justifyContent: 'flex-start', paddingLeft: '14px' }}>書類名</div>
         {showSampleFile && <div>案内文書</div>}
-        {showSampleFile && <div>サンプル ファイル</div>}
+        {(showSampleFile || showPreviewFile) && <div>サンプル ファイル</div>}
         <div>更新者</div>
         <div>更新日時</div>
         {showActions && <div>操作</div>}
@@ -465,7 +510,7 @@ const DataTable = ({
 
           return (
             <React.Fragment key={group}>
-              {!showSampleFile && (
+              {(!showSampleFile) && (
                 <div className="layer-group-header" style={{ borderLeftColor: colors.border }}>
                   <span className="layer-badge" style={{ backgroundColor: colors.badge }}>
                     {groupNames[group]}
@@ -512,6 +557,17 @@ const DataTable = ({
                         uploadedFiles={uploadedFiles}
                         onFileChange={handleFileChange}
                       />
+                    )}
+                    {showPreviewFile && (
+                      <div className="col-sample-preview">
+                        <button
+                          className="btn-preview"
+                          title="プレビュー"
+                          onClick={() => setPreviewForm(form)}
+                        >
+                          <IconEye />
+                        </button>
+                      </div>
                     )}
                     <div className="col-updater">田中 太郎</div>
                     <div className="col-updated">2024年01月15日</div>
@@ -616,6 +672,12 @@ const DataTable = ({
         <AddEditFormModal
           mode="add"
           onClose={() => setShowAddModal(false)}
+        />
+      )}
+      {previewForm && (
+        <PreviewModal
+          form={previewForm}
+          onClose={() => setPreviewForm(null)}
         />
       )}
     </div>
