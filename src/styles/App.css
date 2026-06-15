@@ -688,7 +688,6 @@ body {
 /* Table Header */
 .table-header {
   display: grid;
-  grid-template-columns: 40px 50px 300px 1fr 90px 110px;
   background: #B0E3E6;
   border-bottom: 2px solid #8fd0d4;
   font-weight: 600;
@@ -722,7 +721,6 @@ body {
 /* Table Row */
 .table-row {
   display: grid;
-  grid-template-columns: 40px 50px 300px 1fr 90px 110px;
   border-bottom: 1px solid #f0f0f0;
   transition: background 0.15s;
 }
@@ -773,6 +771,12 @@ body {
   font-weight: 500;
   color: var(--color-text);
   font-size: var(--font-size-sm);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
 .table-row .col-form-name {
