@@ -85,7 +85,7 @@ const UploadCell = ({ formNo, uploadedFiles, onFileChange }) => {
           title="ファイルをアップロード"
           onClick={() => inputRef.current.click()}
         >
-          <IconUpload />
+          <IconFileCheck />
         </button>
       )}
     </div>
@@ -566,7 +566,7 @@ const DataTable = ({
                           title="プレビュー"
                           onClick={() => setPreviewForm(form)}
                         >
-                          <IconPreview />
+                          <IconFileCheck />
                         </button>
                       </div>
                     )}
