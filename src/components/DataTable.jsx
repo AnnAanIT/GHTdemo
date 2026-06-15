@@ -474,21 +474,19 @@ const DataTable = ({
         </div>
       </div>
 
-      {/* Table Header */}
-      <div className="table-header" style={{ gridTemplateColumns: gridCols }}>
-        <div>No.</div>
-        <div>必須</div>
-        <div>様式番号</div>
-        <div style={{ justifyContent: 'flex-start', paddingLeft: '14px' }}>書類名</div>
-        {showSampleFile && <div>案内文書</div>}
-        {(showSampleFile || showPreviewFile) && <div>サンプル ファイル</div>}
-        <div>更新者</div>
-        <div>更新日時</div>
-        {showActions && <div>操作</div>}
-      </div>
-
-      {/* Table Body */}
+      {/* Table Body (header is inside so sticky header shares same scroll container width) */}
       <div className="table-body">
+        <div className="table-header" style={{ gridTemplateColumns: gridCols }}>
+          <div>No.</div>
+          <div>必須</div>
+          <div>様式番号</div>
+          <div style={{ justifyContent: 'flex-start', paddingLeft: '14px' }}>書類名</div>
+          {showSampleFile && <div>案内文書</div>}
+          {(showSampleFile || showPreviewFile) && <div>サンプル ファイル</div>}
+          <div>更新者</div>
+          <div>更新日時</div>
+          {showActions && <div>操作</div>}
+        </div>
         {showWarning && (
           <div className="filter-warning">
             {showAllTypes
