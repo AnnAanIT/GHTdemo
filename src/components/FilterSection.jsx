@@ -2,7 +2,18 @@ import React, { useState } from 'react';
 import { visaTypes, appTypes, sectors } from '../data/formsData';
 import { TAG_DEFINITIONS, TAG_GROUPS } from '../data/tags';
 
-const FilterSection = ({ filters, selectedTags, onFilterChange, onTagChange, onSearch }) => {
+const ALL_TAG_GROUPS = ['org_type', 'category', 'employment', 'support'];
+
+const FilterSection = ({
+  filters,
+  selectedTags,
+  onFilterChange,
+  onTagChange,
+  onSearch,
+  visaOptions = visaTypes,
+  sectorOptions = sectors,
+  enabledTagGroups = ALL_TAG_GROUPS,
+}) => {
   const [collapsed, setCollapsed] = useState(false);
 
   const { visa, appType, sector, searchText } = filters;
@@ -11,6 +22,11 @@ const FilterSection = ({ filters, selectedTags, onFilterChange, onTagChange, onS
   const isTokutei = visa === 'tokutei1' || visa === 'tokutei2';
   const isGijinkoku = visa === 'gijinkoku';
   const isAgricultureOrFishery = sector === 'agriculture' || sector === 'fishery';
+
+  const showOrgType = enabledTagGroups.includes('org_type');
+  const showCategory = isGijinkoku && enabledTagGroups.includes('category');
+  const showEmployment = isTokutei && isAgricultureOrFishery && enabledTagGroups.includes('employment');
+  const showTagLayer = hasBasicInfo && (showOrgType || showCategory || showEmployment);
 
   // Handle visa change - reset everything
   const handleVisaChange = (value) => {
@@ -108,7 +124,7 @@ const FilterSection = ({ filters, selectedTags, onFilterChange, onTagChange, onS
                 <div className="filter-select">
                   <select value={visa} onChange={(e) => handleVisaChange(e.target.value)}>
                     <option value="">-- 選択してください --</option>
-                    {visaTypes.map((v) => (
+                    {visaOptions.map((v) => (
                       <option key={v.value} value={v.value}>{v.label}</option>
                     ))}
                   </select>
@@ -143,7 +159,7 @@ const FilterSection = ({ filters, selectedTags, onFilterChange, onTagChange, onS
                     disabled={!hasBasicInfo || !isTokutei}
                   >
                     <option value="">-- 選択してください --</option>
-                    {sectors.map((s) => (
+                    {sectorOptions.map((s) => (
                       <option key={s.value} value={s.value}>{s.label}</option>
                     ))}
                   </select>
@@ -155,26 +171,28 @@ const FilterSection = ({ filters, selectedTags, onFilterChange, onTagChange, onS
             </div>
 
             {/* Tags Section (requires basic info) */}
-            {hasBasicInfo && (
+            {showTagLayer && (
               <div className="filter-layer layer-2 tag-layer">
                 <span className="layer-label">条件</span>
                 <div className="tag-controls">
                   {/* Org type select */}
-                  <div className="tag-group-control">
-                    <span className="tag-group-label">法人区分</span>
-                    <select
-                      value={getGroupSelectValue('org_type')}
-                      onChange={(e) => handleTagSelect('org_type', e.target.value)}
-                    >
-                      <option value="">-- 選択してください --</option>
-                      {TAG_GROUPS.org_type.options.map(tag => (
-                        <option key={tag} value={tag}>{TAG_DEFINITIONS[tag].label}</option>
-                      ))}
-                    </select>
-                  </div>
+                  {showOrgType && (
+                    <div className="tag-group-control">
+                      <span className="tag-group-label">法人区分</span>
+                      <select
+                        value={getGroupSelectValue('org_type')}
+                        onChange={(e) => handleTagSelect('org_type', e.target.value)}
+                      >
+                        <option value="">-- 選択してください --</option>
+                        {TAG_GROUPS.org_type.options.map(tag => (
+                          <option key={tag} value={tag}>{TAG_DEFINITIONS[tag].label}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
 
                   {/* Category select (gijinkoku only) */}
-                  {isGijinkoku && (
+                  {showCategory && (
                     <div className="tag-group-control">
                       <span className="tag-group-label">カテゴリー</span>
                       <select
@@ -190,7 +208,7 @@ const FilterSection = ({ filters, selectedTags, onFilterChange, onTagChange, onS
                   )}
 
                   {/* 雇用形態 select (tokutei + agriculture/fishery only) */}
-                  {isTokutei && isAgricultureOrFishery && (
+                  {showEmployment && (
                     <div className="tag-group-control">
                       <span className="tag-group-label">雇用形態</span>
                       <select

@@ -2,6 +2,28 @@
 import { TAG_DEFINITIONS } from '../data/tags';
 
 /**
+ * Build the override/order key for a given filter combination
+ */
+export function getFilterKey(filters) {
+  const { visa, appType, sector } = filters;
+  return [visa, appType, sector].join('|');
+}
+
+/**
+ * Load and validate saved data (version 4) from localStorage
+ */
+export function loadSavedData(storageKey) {
+  try {
+    const data = JSON.parse(localStorage.getItem(storageKey));
+    if (!data) return null;
+    if (data.version === 4) return data;
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Check if a form matches base filters (visa + appType + sector)
  */
 function matchesBaseFilters(form, filters) {

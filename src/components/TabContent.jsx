@@ -2,25 +2,9 @@ import { useState, useMemo, useCallback, useEffect, forwardRef, useImperativeHan
 import FilterSection from './FilterSection';
 import DataTable from './DataTable';
 import { formsData as defaultFormsData } from '../data/formsData';
-import { filterForms, getAutoCheckedForms, mergeCheckedState } from '../utils/filterUtils';
+import { filterForms, getAutoCheckedForms, mergeCheckedState, getFilterKey, loadSavedData } from '../utils/filterUtils';
 
-function getFilterKey(filters) {
-  const { visa, appType, sector } = filters;
-  return [visa, appType, sector].join('|');
-}
-
-function loadSavedData(storageKey) {
-  try {
-    const data = JSON.parse(localStorage.getItem(storageKey));
-    if (!data) return null;
-    if (data.version === 4) return data;
-    return null;
-  } catch {
-    return null;
-  }
-}
-
-const TabContent = forwardRef(({ storageKey, showSampleFile = false, showActions = false, showAllTypes = false, showPreviewFile = false, formsDataProp, onHasChangesChange, onSave, hasChanges }, ref) => {
+const TabContent = forwardRef(({ storageKey, showSampleFile = false, showActions = false, showAllTypes = false, showPreviewFile = false, formsDataProp, visaOptions, sectorOptions, enabledTagGroups, onHasChangesChange, onSave, hasChanges }, ref) => {
   const formsData = useMemo(() => formsDataProp || defaultFormsData, [formsDataProp]);
   const saved = useMemo(() => loadSavedData(storageKey), [storageKey]);
 
@@ -133,6 +117,9 @@ const TabContent = forwardRef(({ storageKey, showSampleFile = false, showActions
         onFilterChange={handleFilterChange}
         onTagChange={handleTagChange}
         onSearch={handleSearch}
+        visaOptions={visaOptions}
+        sectorOptions={sectorOptions}
+        enabledTagGroups={enabledTagGroups}
       />
 
       <DataTable
