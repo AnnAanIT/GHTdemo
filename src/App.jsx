@@ -16,7 +16,7 @@ const HAKEN_TAG_GROUPS = ['employment'];
 const TABS = [
   { key: 'shinseinin', label: '申請人書類', storageKey: 'shinseinin-data', showSampleFile: true, showActions: true, formsDataProp: shinseininForms },
   { key: 'shokkikan', label: '所属機関書類', storageKey: 'shokkikan-data', showSampleFile: true, showActions: true, formsDataProp: shokkikanForms },
-  { key: 'haken', label: '派遣先', storageKey: 'haken-data', showSampleFile: true, showActions: true, formsDataProp: hakenForms, visaOptions: HAKEN_VISA_OPTIONS, sectorOptions: HAKEN_SECTOR_OPTIONS, enabledTagGroups: HAKEN_TAG_GROUPS },
+  { key: 'haken', label: '派遣先書類', storageKey: 'haken-data', showSampleFile: true, showActions: true, formsDataProp: hakenForms, visaOptions: HAKEN_VISA_OPTIONS, sectorOptions: HAKEN_SECTOR_OPTIONS, enabledTagGroups: HAKEN_TAG_GROUPS },
   { key: 'online', label: 'オンライン作成書類', storageKey: 'shinsei-shorui-data', showSampleFile: false, showActions: false, showAllTypes: true, showPreviewFile: true, formsDataProp: undefined },
   { key: 'assembly', label: '完成書類プレビュー', isAssembly: true },
 ];
