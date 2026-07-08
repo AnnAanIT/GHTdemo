@@ -88,6 +88,9 @@ const AssemblyTable = ({
           </div>
         </div>
         <div className="table-toolbar-right">
+          <span className="assembly-meta-info">
+            更新者: 田中 太郎　更新日時: 2024年01月15日
+          </span>
           <button
             className={`btn-save ${hasChanges ? 'has-changes' : ''}`}
             onClick={onSave}
@@ -109,8 +112,6 @@ const AssemblyTable = ({
           <div>区分</div>
           <div>様式番号</div>
           <div style={{ justifyContent: 'flex-start', paddingLeft: '14px' }}>書類名</div>
-          <div>更新者</div>
-          <div>更新日時</div>
         </div>
 
         {showWarning && (
@@ -144,8 +145,6 @@ const AssemblyTable = ({
             </div>
             <div className="col-form-no">{form.form_no}</div>
             <div className="col-form-name">{form.form_name}</div>
-            <div className="col-updater">田中 太郎</div>
-            <div className="col-updated">2024年01月15日</div>
           </div>
         ))}
       </div>
