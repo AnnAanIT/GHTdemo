@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { groupNames } from '../data/formsData';
-import { groupByFormGroup, getGroupDescription } from '../utils/filterUtils';
+import { groupByFormGroup, getGroupDescription, getOriginConditionLabel } from '../utils/filterUtils';
 
 const GROUP_ORDER = ['A', 'B', 'C'];
 
@@ -293,7 +293,7 @@ const AddEditFormModal = ({ mode = 'add', onClose }) => {
                   checked={isRequired}
                   onChange={e => setIsRequired(e.target.checked)}
                 />
-                <span>必須</span>
+                <span>対象</span>
               </label>
             </div>
           </div>
@@ -419,9 +419,10 @@ const DataTable = ({
   // Build grid columns based on active optional columns
   const gridCols = [
     '40px',                                                         // No.
-    '50px',                                                         // 必須
+    '50px',                                                         // 対象
     showSampleFile ? '180px' : showPreviewFile ? '240px' : '300px', // 様式番号
     '1fr',                                                          // 書類名
+    '160px',                                                        // 元条件
     showSampleFile ? '240px' : null,                                // 案内文書
     (showSampleFile || showPreviewFile) ? '100px' : null,           // サンプルファイル
     '90px',                                                         // 更新者
@@ -479,9 +480,10 @@ const DataTable = ({
       <div className="table-body">
         <div className="table-header" style={{ gridTemplateColumns: gridCols }}>
           <div>No.</div>
-          <div>必須</div>
+          <div>対象</div>
           <div>様式番号</div>
           <div style={{ justifyContent: 'flex-start', paddingLeft: '14px' }}>書類名</div>
+          <div>元条件</div>
           {showSampleFile && <div>案内文書</div>}
           {(showSampleFile || showPreviewFile) && <div>サンプル ファイル</div>}
           <div>更新者</div>
@@ -547,6 +549,7 @@ const DataTable = ({
                     </div>
                     <div className="col-form-no">{form.form_no}</div>
                     <div className="col-form-name">{form.form_name}</div>
+                    <div className="col-origin-condition">{getOriginConditionLabel(form)}</div>
                     {showSampleFile && (
                       <div className="col-annai-bunsho">
                         {form.annai_bunsho || '—'}
@@ -617,6 +620,7 @@ const DataTable = ({
                 onChange={e => handleNewRowChange(row.id, 'form_name', e.target.value)}
               />
             </div>
+            <div className="col-origin-condition">-</div>
             {showSampleFile && (
               <div className="col-annai-bunsho">
                 <input

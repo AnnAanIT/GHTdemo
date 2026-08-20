@@ -67,7 +67,7 @@ const AssemblyTable = ({
     <div className="table-section">
       {/* Setting Mode Bar */}
       <div className="setting-mode-bar">
-        <span className="setting-mode-label">完成書類一覧</span>
+        <span className="setting-mode-label">申請書類一覧</span>
         <span className="setting-mode-hint">ドラッグして並び替え、「保存」で確定</span>
       </div>
 

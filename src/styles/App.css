@@ -856,6 +856,15 @@ body {
   line-height: 1.4;
 }
 
+.table-row .col-origin-condition {
+  justify-content: flex-start;
+  padding: 4px 8px;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+  word-break: break-word;
+}
+
 .table-row .col-actions {
   justify-content: center;
   gap: 4px;

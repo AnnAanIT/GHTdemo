@@ -128,6 +128,37 @@ export function filterForms(formsData, filters, selectedTags = []) {
 }
 
 /**
+ * Determine a form's origin condition set (元条件) — which 絞り込み条件
+ * categories the form is inherently restricted to, independent of the
+ * currently selected filters/tags.
+ *
+ * Order follows the 絞り込み条件 layout:
+ *   在留資格 → 申請区分 → 特定技能分野 → 法人区分 → 雇用形態 → カテゴリ
+ *
+ * @returns {string} joined labels (e.g. "在留資格 ＋ 申請区分"), or "-" if the
+ *   form has no restriction (applies to all conditions).
+ */
+export function getOriginConditionLabel(form) {
+  const parts = [];
+
+  if (Array.isArray(form.visa) && form.visa.length > 0) parts.push('在留資格');
+  if (Array.isArray(form.appType) && form.appType.length > 0) parts.push('申請区分');
+  if (Array.isArray(form.sector) && form.sector.length > 0) parts.push('特定技能分野');
+
+  const tagGroups = new Set();
+  (form.tags || []).forEach(tag => {
+    const def = TAG_DEFINITIONS[tag];
+    if (def) tagGroups.add(def.group);
+  });
+
+  if (tagGroups.has('org_type')) parts.push('法人区分');
+  if (tagGroups.has('employment')) parts.push('雇用形態');
+  if (tagGroups.has('category')) parts.push('カテゴリ');
+
+  return parts.length > 0 ? parts.join(' ＋ ') : '-';
+}
+
+/**
  * Group forms by form_group (A, B, C)
  */
 export function groupByFormGroup(forms) {

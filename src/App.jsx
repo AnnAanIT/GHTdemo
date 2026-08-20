@@ -18,7 +18,7 @@ const TABS = [
   { key: 'shokkikan', label: '所属機関書類', storageKey: 'shokkikan-data', showSampleFile: true, showActions: true, formsDataProp: shokkikanForms },
   { key: 'haken', label: '派遣先書類', storageKey: 'haken-data', showSampleFile: true, showActions: true, formsDataProp: hakenForms, visaOptions: HAKEN_VISA_OPTIONS, sectorOptions: HAKEN_SECTOR_OPTIONS, enabledTagGroups: HAKEN_TAG_GROUPS },
   { key: 'online', label: 'オンライン作成書類', storageKey: 'shinsei-shorui-data', showSampleFile: false, showActions: false, showAllTypes: true, showPreviewFile: true, formsDataProp: undefined },
-  { key: 'assembly', label: '完成書類プレビュー', isAssembly: true },
+  { key: 'assembly', label: '表示順設定', isAssembly: true },
 ];
 
 function App() {
@@ -40,12 +40,12 @@ function App() {
       <nav className="breadcrumb">
         <a href="#" className="breadcrumb-link">ホーム</a>
         <span className="breadcrumb-sep">/</span>
-        <span className="breadcrumb-current">申請書類管理</span>
+        <span className="breadcrumb-current">申請書類テンプレート</span>
       </nav>
 
       {/* Page Header */}
       <div className="page-header">
-        <h1 className="page-title">申請書類管理</h1>
+        <h1 className="page-title">申請書類テンプレート</h1>
       </div>
 
       {/* Main card — tabs + content */}
